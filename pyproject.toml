@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "forecast-service"
+version = "0.1.0"
+description = "Machine Learning Forecast Service"
+authors = ["AlexGreasley1 <aejg201@exeter.ac.uk>","JedLeas <jedleasyt@gmail.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.109.0"
+uvicorn = "^0.27.0"
+scikit-learn = "^1.4.0"
+pandas = "^2.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
