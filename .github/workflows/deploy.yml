@@ -41,6 +41,8 @@ jobs:
           docker push ${{ env.IMAGE_NAME }}:latest
 
       - name: Deploy to K3s
+        env:
+          KUBECONFIG: /home/user/.kube/config
         run: |
           kubectl apply -f k8s/deploy.yaml
           kubectl rollout restart deployment/forecast-service
