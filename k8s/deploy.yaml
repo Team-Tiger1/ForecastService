@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forecast-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: forecast-service
+  template:
+    metadata:
+      labels:
+        app: forecast-service
+    spec:
+      imagePullSecrets:
+        - name: ghcr-secret
+      containers:
+        - name: forecast-service
+          image: ghcr.io/team-tiger1/forecast-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: forecast-service
+spec:
+  selector:
+    app: forecast-service
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
