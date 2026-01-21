@@ -1,9 +1,11 @@
 import requests
 import pandas as pd
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
+import os
 
-#very smart alex
-API_KEY = "0aa21243848543ddbde183819261401"
+load_dotenv()
+API_KEY = os.getenv("WEATHER_API_KEY")
 
 def save_weather_data(location):
     start_date = datetime.today() - timedelta(days=1)
@@ -29,8 +31,4 @@ def save_weather_data(location):
     df.sort_values("date")
     df.to_csv(df_name, index=False)
 
-#save_weather_data("Exeter")
-
-df = pd.read_csv("weather_files/weather_data_exeter.csv")
-unique_conditions = df["condition"].unique()
-print(unique_conditions)
+save_weather_data("Exeter")
