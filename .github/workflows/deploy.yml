@@ -21,6 +21,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+          cache: 'poetry'
 
       - name: Install Poetry
         run: pip install poetry
@@ -28,7 +29,7 @@ jobs:
       - name: Install dependencies
         run: poetry install
 
-      - name: Run Pytest Tests
+      - name: Run FastApi Pytest Tests
         run: poetry run pytest
 
       - name: Login to GHCR
