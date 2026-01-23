@@ -3,7 +3,7 @@
 # Use "poetry run pytest" to run tests
 from fastapi.testclient import TestClient
 
-from forecast.main import app
+from src.forecast.main import app
 
 client = TestClient(app)
 
