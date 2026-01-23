@@ -1,5 +1,6 @@
 import random
 import string
+import uuid
 
 import pandas as pd
 
@@ -15,6 +16,8 @@ with open("user_creation_data/email_providers.txt", "r") as f:
     EMAIL_PROVIDERS = [line.strip() for line in f]
 
 def create_user():
+    user_id = str(uuid.uuid4())
+
     random_adjective = random.choice(ADJECTIVES).replace(" ","").capitalize()
     random_noun = random.choice(NOUNS).replace(" ","").capitalize()
     username = f"{random_adjective}{random_noun}"
@@ -26,6 +29,7 @@ def create_user():
     email = f"{random_name}@{random_email_provider}.com"
 
     return {
+        "user_id": user_id,
         "username": username,
         "password": password,
         "email": email,

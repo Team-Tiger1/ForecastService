@@ -1,3 +1,4 @@
+import math
 import random
 import uuid
 
@@ -13,7 +14,7 @@ VENDOR_CATEGORIES = pd.read_csv("database_csv_files/vendor_categories.csv")
 OPENING_HOURS = pd.read_csv("database_csv_files/opening_hours.csv")
 
 
-def pick_date(start_date=datetime(2025, 7, 15), end_date=datetime(2026, 1, 15)):
+def pick_date(start_date=datetime(2025, 1, 17), end_date=datetime(2026, 1, 15)):
     delta = end_date - start_date
     random_number_days = random.randint(0, delta.days)
     return start_date + timedelta(days=random_number_days)
@@ -50,7 +51,7 @@ def pick_products(vendor_id, category, budget=25.0):
     return picked_products, round(retail_price, 2)
 
 
-def pick_posting_and_pickup_time(vendor_id, day_of_week):
+def pick_posting_and_pickup_time(vendor_id, day_of_week, date):
     opening_hours = OPENING_HOURS[
         (OPENING_HOURS['vendor_id'] == vendor_id) &
         (OPENING_HOURS['day'] == day_of_week)
@@ -59,11 +60,23 @@ def pick_posting_and_pickup_time(vendor_id, day_of_week):
     opening_time = datetime.strptime(opening_hours.iloc[0]['opening_time'], "%H:%M").time()
     closing_time = datetime.strptime(opening_hours.iloc[0]['closing_time'], "%H:%M").time()
 
-    posting_time = random.randint(opening_time.hour, closing_time.hour - 1)
-    pickup_start = random.randint(posting_time, closing_time.hour - 1)
-    pickup_end = random.randint(pickup_start + 1, closing_time.hour)
+    posting_time_float = random.uniform(opening_time.hour, closing_time.hour - 1)
+    pickup_start_hour = random.randint(math.ceil(posting_time_float), closing_time.hour - 1)
+    pickup_end_hour = random.randint(pickup_start_hour + 1, closing_time.hour)
 
-    return time(posting_time, 0), time(pickup_start, 0), time(pickup_end, 0)
+    posting_time_hour = int(posting_time_float)
+    posting_time_minutes = int((posting_time_float -  posting_time_hour) * 60)
+    posting_time_seconds = int(((posting_time_float -  posting_time_hour) * 60 - posting_time_minutes) * 60)
+
+    posting_datetime = datetime.combine(date, time(hour=posting_time_hour, minute=posting_time_minutes, second=posting_time_seconds))
+    pickup_start_datetime = datetime.combine(date, time(hour=pickup_start_hour))
+    pickup_end_datetime = datetime.combine(date, time(hour=pickup_end_hour))
+
+    posting_time = int(posting_datetime.timestamp())
+    pickup_start = int(pickup_start_datetime.timestamp())
+    pickup_end = int(pickup_end_datetime.timestamp())
+
+    return posting_time, pickup_start, pickup_end
 
 
 def simulate_bundle():
@@ -83,7 +96,7 @@ def simulate_bundle():
 
     description = f"{category} bundle from {vendor_name}. Contains {len(picked_products)} product(s)."
 
-    posting_time, pickup_start, pickup_end = pick_posting_and_pickup_time(vendor_id, day_of_week)
+    posting_time, pickup_start, pickup_end = pick_posting_and_pickup_time(vendor_id, day_of_week, date)
 
     bundle_id = str(uuid.uuid4())
 
@@ -98,7 +111,6 @@ def simulate_bundle():
         'posting_time': posting_time,
         'collection_start': pickup_start,
         'collection_end': pickup_end,
-        'date': date
     }
 
     bundles_products = []
@@ -112,7 +124,7 @@ def simulate_bundle():
     return bundle, bundles_products
 
 
-def generate_bundles(number_of_bundles=400):
+def generate_bundles(number_of_bundles=1000):
     bundles_list = []
     bundle_products_list = []
 
