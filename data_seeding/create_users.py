@@ -33,15 +33,19 @@ def create_user():
         "username": username,
         "password": password,
         "email": email,
-        "money_saved": None,
+        "date_last_collection": None,
         "streak": None
     }
 
 
 def create_users(num_users=250):
+    print("Creating Users...")
+
     users = [create_user() for _ in range(num_users)]
     users_df = pd.DataFrame(users)
-    users_df.to_csv("database_csv_files/users.csv", index=False)
+
+    print(f"Created {len(users_df)} users.")
+    users_df.to_csv("database/users.csv", index=False)
 
 if __name__ == "__main__":
     create_users()
