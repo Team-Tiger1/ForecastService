@@ -8,10 +8,23 @@ from datetime import datetime, timedelta, time
 RANDOM_SEED = 12
 random.seed(RANDOM_SEED)
 
-VENDORS = pd.read_csv("database_csv_files/vendors.csv")
-PRODUCTS = pd.read_csv("database_csv_files/vendor_products.csv")
-VENDOR_CATEGORIES = pd.read_csv("database_csv_files/vendor_categories.csv")
-OPENING_HOURS = pd.read_csv("database_csv_files/opening_hours.csv")
+VENDORS = pd.read_csv("database/vendors.csv")
+PRODUCTS = pd.read_csv("database/vendors_products.csv")
+VENDOR_CATEGORIES = pd.read_csv("database/vendors_categories.csv")
+OPENING_HOURS = pd.read_csv("database/opening_hours.csv")
+
+CATEGORY_MAP = {
+    'BREAD_BAKED_GOODS': 'Bread & Baked Goods',
+    'SWEET_TREATS_DESSERTS': 'Sweet Treats & Desserts',
+    'MEAT_PROTEIN': 'Meat & Protein',
+    'FRUIT_VEGETABLES': 'Fruit & Vegetables',
+    'DAIRY_EGGS': 'Dairy & Eggs',
+    'READY_MEALS_HOT_FOOD': 'Ready Meals & Hot Food',
+    'SNACKS_SAVOURY_ITEMS': 'Snacks & Savoury Items',
+    'BREAKFAST_ITEMS': 'Breakfast Items',
+    'VEGAN_VEGETARIAN': 'Vegan & Vegetarian',
+    'DRINKS_BEVERAGES': 'Drinks & Beverages'
+}
 
 
 def pick_date(start_date=datetime(2025, 1, 17), end_date=datetime(2026, 1, 15)):
@@ -72,9 +85,9 @@ def pick_posting_and_pickup_time(vendor_id, day_of_week, date):
     pickup_start_datetime = datetime.combine(date, time(hour=pickup_start_hour))
     pickup_end_datetime = datetime.combine(date, time(hour=pickup_end_hour))
 
-    posting_time = int(posting_datetime.timestamp())
-    pickup_start = int(pickup_start_datetime.timestamp())
-    pickup_end = int(pickup_end_datetime.timestamp())
+    posting_time = posting_datetime.isoformat()
+    pickup_start = pickup_start_datetime.isoformat()
+    pickup_end = pickup_end_datetime.isoformat()
 
     return posting_time, pickup_start, pickup_end
 
@@ -94,7 +107,7 @@ def simulate_bundle():
     picked_products, retail_price = pick_products(vendor_id, category)
     price = round(retail_price * random.uniform(0.25, 0.75), 2)
 
-    description = f"{category} bundle from {vendor_name}. Contains {len(picked_products)} product(s)."
+    description = f"{CATEGORY_MAP[category]} bundle from {vendor_name}. Contains {len(picked_products)} product(s)."
 
     posting_time, pickup_start, pickup_end = pick_posting_and_pickup_time(vendor_id, day_of_week, date)
 
@@ -103,7 +116,7 @@ def simulate_bundle():
     bundle = {
         'bundle_id': bundle_id,
         'vendor_id': vendor_id,
-        'name': f"{vendor_name} {category} Bundle",
+        'name': f"{vendor_name} {CATEGORY_MAP[category]} Bundle",
         'description': description,
         'retail_price': retail_price,
         'price': price,
@@ -124,11 +137,13 @@ def simulate_bundle():
     return bundle, bundles_products
 
 
-def generate_bundles(number_of_bundles=1000):
+def generate_bundles(num_bundles=1000):
+    print("Generating Bundles...")
+
     bundles_list = []
     bundle_products_list = []
 
-    for _ in range(number_of_bundles):
+    for _ in range(num_bundles):
         bundle, bundles_products = simulate_bundle()
         bundles_list.append(bundle)
         bundle_products_list.extend(bundles_products)
@@ -136,8 +151,9 @@ def generate_bundles(number_of_bundles=1000):
     bundles_df = pd.DataFrame(bundles_list)
     bundles_products_df = pd.DataFrame(bundle_products_list)
 
-    bundles_df.to_csv("database_csv_files/bundles.csv", index=False)
-    bundles_products_df.to_csv("database_csv_files/bundles_products.csv", index=False)
+    print(f"Generated {len(bundles_df)} bundles.")
+    bundles_df.to_csv("database/bundles.csv", index=False)
+    bundles_products_df.to_csv("database/bundles_products.csv", index=False)
 
 
 if __name__ == "__main__":
