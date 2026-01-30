@@ -1,4 +1,4 @@
-product_id,vendor_id,name,retail_price,weight,category
+productId,vendorId,name,retailPrice,weight,category
 f6cc189a-4d89-48ef-8574-b6375fd56ad5,2f2530fe-56a0-4069-b06d-83a578929129,White Toastie Bread,1.4,800,BREAD_BAKED_GOODS
 50b8bf3c-2d59-417e-8fa3-0dcbbae572e5,2f2530fe-56a0-4069-b06d-83a578929129,White Farmhouse Bread,1.5,800,BREAD_BAKED_GOODS
 7222772a-129b-4e31-9a49-62620e437f6f,2f2530fe-56a0-4069-b06d-83a578929129,White Bloomer,1.85,800,BREAD_BAKED_GOODS

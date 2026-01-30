@@ -1,0 +1,19 @@
+condition,value
+Sunny,1.0
+Partly cloudy,0.9
+Cloudy,1.0
+Overcast,0.7
+Mist,0.5
+Light drizzle,0.3
+Patchy light drizzle,0.4
+Light rain,0.3
+Light rain shower,0.3
+Patchy rain possible,0.4
+Moderate rain,0.2
+Moderate rain at times,0.3
+Moderate or heavy rain shower,0.1
+Heavy rain at times,0.1
+Moderate or heavy rain with thunder,0.1
+Thundery outbreaks possible,0.2
+Fog,0.4
+Moderate or heavy snow showers,0.0

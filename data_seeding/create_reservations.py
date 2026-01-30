@@ -1,197 +1,211 @@
-import random
 import uuid
-from datetime import datetime
-from random import sample
 
 import pandas as pd
+import math
+import random
+from datetime import datetime
 
 RANDOM_SEED = 12
 random.seed(RANDOM_SEED)
 
-BUNDLES = pd.read_csv("database_csv_files/bundles.csv")
-USERS = pd.read_csv("database_csv_files/users.csv")
-WEATHER = pd.read_csv("weather_files/weather_data_exeter.csv")
+WEATHER = pd.read_csv('weather_files/weather_data_exeter.csv')
+BUNDLES = pd.read_csv('database/bundles.csv')
+USERS = pd.read_csv('database/users.csv')
 
-WEATHER_MODIFIER = pd.read_csv("probability_modifiers/weather.csv")
-TEMPERATURE_MODIFIER = pd.read_csv("probability_modifiers/temperature.csv")
-DISCOUNT_MODIFIER = pd.read_csv("probability_modifiers/discount.csv")
-PRICE_MODIFIER = pd.read_csv("probability_modifiers/price.csv")
-TIME_BETWEEN_POST_AND_COLLECTION_MODIFIER = pd.read_csv("probability_modifiers/time_between_post_and_collection.csv")
-DAY_MODIFIER = pd.read_csv("probability_modifiers/day_of_week.csv")
-CATEGORY_MODIFIER = pd.read_csv("probability_modifiers/category.csv")
-COLLECTION_TIME_MODIFIER = pd.read_csv("probability_modifiers/collection_time.csv")
-COLLECTION_WINDOW_MODIFIER = pd.read_csv("probability_modifiers/collection_window_length.csv")
-TIME_BETWEEN_RESERVATION_AND_COLLECTION_MODIFIER = pd.read_csv(
-    "probability_modifiers/time_between_reservation_and_collection.csv")
+NORMALISED_CATEGORIES = pd.read_csv('normalisation_files/categories.csv')
+NORMALISED_WEATHER = pd.read_csv('normalisation_files/weather.csv')
 
 
-def time_str_to_hours(time_str):
-    time = datetime.strptime(time_str, "%H:%M:%S")
-    return time.hour
+def normalise_price(price):
+    return math.exp(-0.1 * price)
 
 
-def get_probability_modifier(df, value, value_type="exact"):
-    if value_type == "exact":
-        row = df[df['x'] == value]
-
-    elif value_type == "range":
-        row = df[(df['min'] <= value) & (df['max'] >= value)]
-
-    if row.empty: raise ValueError(
-        f"No probability modifier found for value={value} " f"in range [{df['min'].min()}, {df['max'].max()}]" f"{df}")
-
-    return float(row['probability'].iloc[0])
+def normalise_weather(condition):
+    return NORMALISED_WEATHER.loc[NORMALISED_WEATHER['condition'] == condition, 'value'].values[0]
 
 
-def reservation_collection_probability(weather,
-                                       temperature,
-                                       discount,
-                                       price,
-                                       time_between_post_and_collection,
-                                       day_of_week,
-                                       category,
-                                       collection_time,
-                                       collection_window_length,
-                                       time_between_reservation_and_collection=None,
-                                       multiplier=1.0):
-    p_weather = get_probability_modifier(WEATHER_MODIFIER, weather, "exact")
-    p_temperature = get_probability_modifier(TEMPERATURE_MODIFIER, temperature, "range")
-    p_discount = get_probability_modifier(DISCOUNT_MODIFIER, discount, "range")
-    p_price = get_probability_modifier(PRICE_MODIFIER, price, "range")
-    p_time_between_post_and_collection = get_probability_modifier(TIME_BETWEEN_POST_AND_COLLECTION_MODIFIER,
-                                                                  time_between_post_and_collection, "range")
-    p_day_of_week = get_probability_modifier(DAY_MODIFIER, day_of_week, "exact")
-    p_category = get_probability_modifier(CATEGORY_MODIFIER, category, "exact")
-    p_collection_time = get_probability_modifier(COLLECTION_TIME_MODIFIER, collection_time, "range")
-    p_collection_window_length = get_probability_modifier(COLLECTION_WINDOW_MODIFIER, collection_window_length, "range")
-
-    if time_between_reservation_and_collection is None:
-        prob_list = [p_weather, p_temperature, p_discount, p_price, p_time_between_post_and_collection, p_day_of_week,
-                     p_category, p_collection_time, p_collection_window_length]
-    else:
-        p_time_between_reservation_and_collection = get_probability_modifier(
-            TIME_BETWEEN_RESERVATION_AND_COLLECTION_MODIFIER, time_between_reservation_and_collection, "range")
-
-        prob_list = [p_weather, p_temperature, p_discount, p_price, p_time_between_post_and_collection, p_day_of_week,
-                     p_category, p_collection_time, p_collection_window_length,
-                     p_time_between_reservation_and_collection]
-
-    probability = 1
-    for prob in prob_list:
-        probability = max(0, min(probability, 1))
-        probability *= (1 - prob)
-
-    probability = 1 - probability
-    probability *= multiplier
-    return probability
+def normalise_category(category):
+    return NORMALISED_CATEGORIES.loc[NORMALISED_CATEGORIES['category'] == category, 'value'].values[0]
 
 
-def reservation_collection_occurs(bundle_id, reservation_collection, reservation_time=None):
-    bundle = BUNDLES[BUNDLES['bundle_id'] == bundle_id].iloc[0]
+def normalise_temperature(temp_c):
+    optimal_temp = 20
+    standard_deviation = 10
+    return math.exp(-((temp_c - optimal_temp) ** 2) / (2 * (standard_deviation ** 2)))
 
-    posting_time = bundle['posting_time']
-    collection_start = bundle['collection_start']
-    collection_end = bundle['collection_end']
 
-    date = datetime.fromtimestamp(posting_time).date()
-    day_of_week = date.strftime("%A")
+def normalise_lead_time(hours):
+    if hours < 1: return 0.3
+    if 1 <= hours <= 4: return 1.0
+    if hours > 6: return 0.4
+    return 0.6
 
-    time_between_post_and_collection = (collection_start - posting_time) / 3600
-    collection_window_length = (collection_end - collection_start) / 3600
-    midpoint_datetime = datetime.fromtimestamp((collection_start + collection_end) / 2)
-    collection_time = midpoint_datetime.hour + midpoint_datetime.minute / 60 + midpoint_datetime.second / 60
+
+def normalise_window_length(hours):
+    return min(1.0, hours / 4.0)
+
+
+def normalise_time_of_day(hour):
+    if 11 <= hour <= 14: return 1.0
+    if 17 <= hour <= 20: return 0.9
+    if 8 <= hour <= 10: return 0.6
+    if hour > 21: return 0.2
+    return 0.5
+
+
+def calculate_decision(bundle, weights, threshold, create_dataset_entry=False):
+    fmt = "%Y-%m-%dT%H:%M:%S"
+    post_datetime = datetime.strptime(bundle['posting_time'], fmt)
+    start_datetime = datetime.strptime(bundle['collection_start'], fmt)
+    end_datetime = datetime.strptime(bundle['collection_end'], fmt)
 
     price = bundle['price']
     retail_price = bundle['retail_price']
-    discount = (1 - price / retail_price) * 100
     category = bundle['category']
+    date = start_datetime.strftime('%Y-%m-%d')
 
-    date_str = datetime.fromtimestamp(posting_time).strftime('%Y-%m-%d')
-    weather_of_day = WEATHER[WEATHER['date'] == date_str].iloc[0]
-    weather = weather_of_day['condition']
-    temperature = weather_of_day['avgtemp_c']
+    discount = max(0, (retail_price - price) / retail_price)
+    lead_time_hrs = (start_datetime - post_datetime).total_seconds() / 3600
+    window_length_hrs = (end_datetime - start_datetime).total_seconds() / 3600
+    pickup_hour = start_datetime.hour + (start_datetime.minute / 60)
+    is_weekend = start_datetime.weekday() >= 5
 
-    probability = 1
-    if reservation_collection == "reservation":
-        probability = reservation_collection_probability(weather,
-                                                         temperature,
-                                                         discount,
-                                                         price,
-                                                         time_between_post_and_collection,
-                                                         day_of_week,
-                                                         category,
-                                                         collection_time,
-                                                         collection_window_length)
+    weather = WEATHER[WEATHER['date'] == date].iloc[0]
+    condition = weather['condition'].strip()
+    temperature = weather['avgtemp_c']
 
-    elif reservation_collection == "collection":
-        time_between_reservation_and_collection_datetime = datetime.fromtimestamp(collection_end - reservation_time)
-        time_between_reservation_and_collection = time_between_reservation_and_collection_datetime.hour + time_between_reservation_and_collection_datetime.minute / 60 + time_between_reservation_and_collection_datetime.second / 60
-        multiplier = 0.8
-        probability = reservation_collection_probability(weather,
-                                                         temperature,
-                                                         discount,
-                                                         price,
-                                                         time_between_post_and_collection,
-                                                         day_of_week,
-                                                         category,
-                                                         collection_time,
-                                                         collection_window_length,
-                                                         time_between_reservation_and_collection,
-                                                         multiplier)
+    normalised_discount = discount
+    normalised_price = normalise_price(price)
+    normalised_weather = normalise_weather(condition)
+    normalised_category = normalise_category(category)
+    normalised_temperature = normalise_temperature(temperature)
+    normalised_day = 1.0 if is_weekend else 0.7
+    normalised_lead_time = normalise_lead_time(lead_time_hrs)
+    normalised_window_length = normalise_window_length(window_length_hrs)
+    normalised_time_of_day = normalise_time_of_day(pickup_hour)
 
-    probability = probability + random.gauss(0, 0.1)
-    probability = max(0, min(probability, 1))
-    return random.random() < probability
+    score = (
+            (normalised_discount * weights['discount']) +
+            (normalised_price * weights['price']) +
+            (normalised_weather * weights['weather']) +
+            (normalised_category * weights['category']) +
+            (normalised_temperature * weights['temperature']) +
+            (normalised_day * weights['day_of_week']) +
+            (normalised_lead_time * weights['lead_time']) +
+            (normalised_window_length * weights['window_length']) +
+            (normalised_time_of_day * weights['time_of_day'])
+    )
+
+    if create_dataset_entry:
+        dataset_entry = {
+            'discount': discount,
+            'price': price,
+            'weather': condition,
+            'category': category,
+            'temperature': temperature,
+            'day': start_datetime.strftime('%A'),
+            'lead_time': lead_time_hrs,
+            'window_length': window_length_hrs,
+            'time_of_day': pickup_hour
+        }
+
+        return score > threshold, dataset_entry
+
+    return score > threshold
 
 
-def simulate_reservation(bundle_id, user_id):
-    is_reserved = reservation_collection_occurs(bundle_id, "reservation")
-    if not is_reserved:
-        return None
+def simulate_reservation(bundle, user_id):
+    reservation_weights = {
+        'discount': 0.3,
+        'price': 0.15,
+        'weather': 0.15,
+        'lead_time': 0.1,
+        'temperature': 0.1,
+        'day_of_week': 0.05,
+        'window_length': 0.05,
+        'time_of_day': 0.05,
+        'category': 0.05
+    }
 
-    reservation_id = str(uuid.uuid4())
-    bundle = BUNDLES[BUNDLES['bundle_id'] == bundle_id].iloc[0]
-    amount_due = bundle['price']
+    threshold = 0.45 + random.uniform(-0.05, 0.05)
+    is_reserved, dataset_entry = calculate_decision(bundle, reservation_weights, threshold, True)
+    dataset_entry['is_reserved'] = is_reserved
 
-    posting_time = bundle['posting_time']
-    collection_start = bundle['collection_start']
-    collection_end = bundle['collection_end']
-    reservation_time = random.uniform(posting_time, collection_end - 3600)
+    collection_weights = {
+        'weather': 0.3,
+        'temperature': 0.15,
+        'window_length': 0.15,
+        'day_of_week': 0.1,
+        'time_of_day': 0.1,
+        'lead_time': 0.05,
+        'discount': 0.05,
+        'price': 0.05,
+        'category': 0.05
+    }
 
-    is_collected = reservation_collection_occurs(bundle_id, "collection", reservation_time)
-    if is_collected:
-        collection_status = "COLLECTED"
-        collection_time = random.uniform(max(reservation_time, collection_start), collection_end)
+    if is_reserved:
+        threshold = 0.45 + random.uniform(-0.05, 0.05)
+        is_collected = calculate_decision(bundle, collection_weights, threshold, False)
+        dataset_entry['is_collected'] = is_collected
     else:
-        collection_status = "NO_SHOW"
-        collection_time = None
+        dataset_entry['is_collected'] = False
+        return None, dataset_entry
+
+    if is_collected:
+        status = 'COLLECTED'
+    else:
+        status = 'NO_SHOW'
+
+    reservation_id = uuid.uuid4()
+    bundle_id = bundle['bundle_id']
+
+    posting_timestamp = datetime.fromisoformat(bundle['posting_time']).timestamp()
+    collection_start_timestamp = datetime.fromisoformat(bundle['collection_start']).timestamp()
+    collection_end_timestamp = datetime.fromisoformat(bundle['collection_end']).timestamp()
+
+    reservation_time_unix = random.uniform(posting_timestamp, collection_end_timestamp - 3600)
+    reservation_time = datetime.fromtimestamp(reservation_time_unix).isoformat()
+
+    collection_time_unix = random.uniform(max(reservation_time_unix, collection_start_timestamp),
+                                          collection_end_timestamp)
+    collection_time = datetime.fromtimestamp(collection_time_unix).isoformat()
 
     reservation = {
         'reservation_id': reservation_id,
         'bundle_id': bundle_id,
         'user_id': user_id,
-        'amount_due': amount_due,
+        'amount_due': bundle['price'],
         'reservation_time': reservation_time,
-        'collection_status': collection_status,
-        'collection_time': collection_time
+        'collection_time': collection_time,
+        'collection_status': status,
     }
 
-    return reservation
+    return reservation, dataset_entry
+
 
 def generate_reservations():
-    reservations_list = []
+    print("Generating Reservations...")
 
-    for row in BUNDLES.itertuples():
-        users_list = USERS.to_dict('records')
-        user = random.choice(users_list)
-        user_id = user['user_id']
+    users_list = USERS.to_dict('records')
 
-        reservation = simulate_reservation(row.bundle_id, user_id)
-        if reservation is not None:
-            reservations_list.append(reservation)
+    reservations = []
+    dataset = []
+    for _, bundle in BUNDLES.iterrows():
+        user_id = random.choice(users_list)['user_id']
+        reservation, dataset_entry = simulate_reservation(bundle, user_id)
 
-    reservations_df = pd.DataFrame(reservations_list)
-    reservations_df.to_csv('database_csv_files/reservations.csv', index=False)
+        dataset.append(dataset_entry)
+
+        if reservation:
+            reservations.append(reservation)
+
+    dataset_df = pd.DataFrame(dataset)
+    dataset_df.to_csv('dataset/dataset.csv', index=False)
+
+    reservations_df = pd.DataFrame(reservations)
+    reservations_df.to_csv('database/reservations.csv', index=False)
+    print(f"Generated {len(reservations_df)} reservations")
+
 
 if __name__ == "__main__":
     generate_reservations()

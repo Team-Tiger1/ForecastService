@@ -27,7 +27,7 @@ CATEGORY_MAP = {
 }
 
 
-def pick_date(start_date=datetime(2025, 1, 17), end_date=datetime(2026, 1, 15)):
+def pick_date(start_date=datetime(2026, 1, 1), end_date=datetime(2026, 1, 15)):
     delta = end_date - start_date
     random_number_days = random.randint(0, delta.days)
     return start_date + timedelta(days=random_number_days)
@@ -137,7 +137,7 @@ def simulate_bundle():
     return bundle, bundles_products
 
 
-def generate_bundles(num_bundles=1000):
+def generate_bundles(num_bundles=25000):
     print("Generating Bundles...")
 
     bundles_list = []
