@@ -60,7 +60,7 @@ def add_streaks():
         dates.append(date_last_collection)
 
     USERS['streak'] = streaks
-    USERS['date_last_collection'] = dates
+    USERS['lastReservationTime'] = dates
 
     print(f"Created user streaks for {len(USERS)} users.")
     USERS.to_csv('database/users.csv', index=False)
