@@ -127,7 +127,7 @@ def simulate_reservation(bundle, user_id):
         'category': 0.05
     }
 
-    threshold = 0.45 + random.uniform(-0.05, 0.05)
+    threshold = 0.5 + random.uniform(-0.05, 0.05)
     is_reserved, dataset_entry = calculate_decision(bundle, reservation_weights, threshold, True)
     dataset_entry['is_reserved'] = is_reserved
 
@@ -144,7 +144,7 @@ def simulate_reservation(bundle, user_id):
     }
 
     if is_reserved:
-        threshold = 0.45 + random.uniform(-0.05, 0.05)
+        threshold = 0.5 + random.uniform(-0.05, 0.05)
         is_collected = calculate_decision(bundle, collection_weights, threshold, False)
         dataset_entry['is_collected'] = is_collected
     else:
