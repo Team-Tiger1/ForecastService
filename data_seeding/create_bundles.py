@@ -9,8 +9,8 @@ RANDOM_SEED = 12
 random.seed(RANDOM_SEED)
 
 VENDORS = pd.read_csv("database/vendors.csv")
-PRODUCTS = pd.read_csv("database/vendors_products.csv")
-VENDOR_CATEGORIES = pd.read_csv("database/vendors_categories.csv")
+PRODUCTS = pd.read_csv("database/products.csv")
+VENDOR_CATEGORIES = pd.read_csv("database/categories.csv")
 OPENING_HOURS = pd.read_csv("database/opening_hours.csv")
 
 CATEGORY_MAP = {
@@ -27,7 +27,7 @@ CATEGORY_MAP = {
 }
 
 
-def pick_date(start_date=datetime(2026, 1, 1), end_date=datetime(2026, 1, 15)):
+def pick_date(start_date=datetime(2025, 1, 17), end_date=datetime(2026, 1, 15)):
     delta = end_date - start_date
     random_number_days = random.randint(0, delta.days)
     return start_date + timedelta(days=random_number_days)
@@ -78,10 +78,11 @@ def pick_posting_and_pickup_time(vendor_id, day_of_week, date):
     pickup_end_hour = random.randint(pickup_start_hour + 1, closing_time.hour)
 
     posting_time_hour = int(posting_time_float)
-    posting_time_minutes = int((posting_time_float -  posting_time_hour) * 60)
-    posting_time_seconds = int(((posting_time_float -  posting_time_hour) * 60 - posting_time_minutes) * 60)
+    posting_time_minutes = int((posting_time_float - posting_time_hour) * 60)
+    posting_time_seconds = int(((posting_time_float - posting_time_hour) * 60 - posting_time_minutes) * 60)
 
-    posting_datetime = datetime.combine(date, time(hour=posting_time_hour, minute=posting_time_minutes, second=posting_time_seconds))
+    posting_datetime = datetime.combine(date, time(hour=posting_time_hour, minute=posting_time_minutes,
+                                                   second=posting_time_seconds))
     pickup_start_datetime = datetime.combine(date, time(hour=pickup_start_hour))
     pickup_end_datetime = datetime.combine(date, time(hour=pickup_end_hour))
 
@@ -107,11 +108,22 @@ def simulate_bundle():
     picked_products, retail_price = pick_products(vendor_id, category)
     price = round(retail_price * random.uniform(0.25, 0.75), 2)
 
-    description = f"{CATEGORY_MAP[category]} bundle from {vendor_name}. Contains {len(picked_products)} product(s)."
-
     posting_time, pickup_start, pickup_end = pick_posting_and_pickup_time(vendor_id, day_of_week, date)
 
     bundle_id = str(uuid.uuid4())
+
+    bundles_products = []
+    total_products = 0
+    for product in picked_products:
+        quantity = product['quantity']
+        total_products += quantity
+        bundles_products.append({
+            'bundle_id': bundle_id,
+            'product_id': product['product_id'],
+            'quantity': quantity
+        })
+
+    description = f"{CATEGORY_MAP[category]} bundle from {vendor_name}. Contains {total_products} product(s)."
 
     bundle = {
         'bundle_id': bundle_id,
@@ -125,14 +137,6 @@ def simulate_bundle():
         'collection_start': pickup_start,
         'collection_end': pickup_end,
     }
-
-    bundles_products = []
-    for product in picked_products:
-        bundles_products.append({
-            'bundle_id': bundle_id,
-            'product_id': product['product_id'],
-            'quantity': product['quantity']
-        })
 
     return bundle, bundles_products
 

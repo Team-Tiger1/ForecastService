@@ -27,8 +27,7 @@ def simulate_dispute(reservation_id):
         "missing_items": {
             "complaint": "I collected my bundle but there were missing items.",
             "vendor_approve_response": "We apologise for this. This is not acceptable. We will refund you for this bundle.",
-            "vendor_deny_response": "Unfortunately, we will not be able to refund this bundle. We know that all items were placed inside this bundle",
-
+            "vendor_deny_response": "Unfortunately, we will not be able to refund this bundle. We know that all items were placed inside this bundle.",
         },
         "spoiled_item": {
             "complaint": "One of the items was already spoiled when I got home.",
@@ -55,7 +54,7 @@ def simulate_dispute(reservation_id):
     random_dispute_key = random.choice(list(possible_disputes.keys()))
     chosen_dispute = possible_disputes[random_dispute_key]
 
-    if random.random() < 0.3:
+    if random.random() < 0.15:
         status = "APPROVED"
         vendor_response = chosen_dispute['vendor_approve_response']
     else:

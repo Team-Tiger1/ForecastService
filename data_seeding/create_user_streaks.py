@@ -1,10 +1,10 @@
 from collections import defaultdict
-
 import pandas as pd
 
+# Load data
 USERS = pd.read_csv('database/users.csv')
 RESERVATIONS = pd.read_csv('database/reservations.csv')
-SUCCESSFUL_COLLECTIONS = df = RESERVATIONS[RESERVATIONS['collection_status'] == "COLLECTED"]
+SUCCESSFUL_COLLECTIONS = RESERVATIONS[RESERVATIONS['collection_status'] == "COLLECTED"]
 
 LATEST_DATE = pd.Timestamp("2026-01-15")
 LATEST_WEEK = LATEST_DATE.to_period('W')
@@ -17,13 +17,14 @@ for _, row in SUCCESSFUL_COLLECTIONS.iterrows():
 
 
 def calculate_streak(user_collection_dates):
-    collection_weeks = []
-    for date in user_collection_dates:
-        collection_weeks.append(date.to_period('W'))
-        collection_weeks = list(set(collection_weeks))
-        collection_weeks = sorted(collection_weeks, reverse=True)
+    collection_weeks = [date.to_period('W') for date in user_collection_dates]
+    collection_weeks = sorted(list(set(collection_weeks)), reverse=True)
+
+    if not collection_weeks:
+        return 0
 
     latest_collection_week = collection_weeks[0]
+
     if (LATEST_WEEK - latest_collection_week).n > 1:
         return 0
 
@@ -47,6 +48,7 @@ def get_streak(user_id):
 
     return streak, date_last_collection
 
+
 def add_streaks():
     print("Creating User Streaks...")
 
@@ -60,10 +62,11 @@ def add_streaks():
         dates.append(date_last_collection)
 
     USERS['streak'] = streaks
-    USERS['lastReservationTime'] = dates
+    USERS['date_last_collection'] = dates
 
     print(f"Created user streaks for {len(USERS)} users.")
     USERS.to_csv('database/users.csv', index=False)
+
 
 if __name__ == '__main__':
     add_streaks()
