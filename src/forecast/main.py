@@ -22,7 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
+@app.get("/forecast")
 def health_check():
     return {"status": "ok", "message": "Forecast Service is running"}
 
