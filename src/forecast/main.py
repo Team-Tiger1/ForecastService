@@ -14,7 +14,6 @@ origins = [
     "http://localhost:3000",
     "http://localhost:8080",
 ]
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -23,20 +22,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+def health_check():
+    return {"status": "ok", "message": "Forecast Service is running"}
+
 
 @app.get("/forecast/vendor-data")
 def get_vendor_data(
-        vendor_id: str = Depends(get_current_vendor_id),
-        db: Session = Depends(get_db)
+    vendor_id: str = Depends(get_current_vendor_id),
+    db: Session = Depends(get_db)
 ):
-
     try:
-
         query = text("SELECT * FROM product WHERE vendor_id = :vid")
         result = db.execute(query, {"vid": vendor_id}).fetchall()
-
         products = [row._asdict() for row in result]
-
         return {
             "vendor_id": vendor_id,
             "product_count": len(products),
