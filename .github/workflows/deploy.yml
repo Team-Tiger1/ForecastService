@@ -27,7 +27,9 @@ jobs:
         run: pip install poetry
 
       - name: Install dependencies
-        run: poetry install
+        run: |
+          poetry lock
+          poetry install
 
       - name: Run FastApi Pytest Tests
         run: poetry run pytest
