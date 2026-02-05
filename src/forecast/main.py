@@ -27,8 +27,8 @@ def health_check():
     return {"status": "ok", "message": "Forecast Service is running"}
 
 
-@app.get("/forecast/vendor-data")
-def get_vendor_data(
+@app.get("/forecast/vendor")
+def get_vendor(
     vendor_id: str = Depends(get_current_vendor_id),
     db: Session = Depends(get_db)
 ):

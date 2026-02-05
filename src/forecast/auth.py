@@ -1,4 +1,5 @@
 import os
+import base64
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
@@ -6,7 +7,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SECRET_KEY = os.getenv("JWT_SECRET_KEY", "defaultJWTSECRETKEYFORTESTING2543676897jiohu")
+secret_env = os.getenv("JWT_SECRET_KEY", "defaultJWTSECRETKEYFORTESTING2543676897jiohu")
+
+try:
+    SECRET_KEY = base64.b64decode(secret_env)
+except Exception:
+    SECRET_KEY = secret_env
 
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
