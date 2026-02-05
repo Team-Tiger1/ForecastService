@@ -20,6 +20,25 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 5000
+
+          env:
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secrets
+                  key: jwt-secret
+
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secrets
+                  key: db-password
+            - name: DB_HOST
+              value: "192.168.0.151"
+            - name: DB_USER
+              value: "admin"
+            - name: DB_NAME
+              value: "thelastfork_db"
 ---
 apiVersion: v1
 kind: Service

@@ -1,22 +1,39 @@
+import os
 import base64
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+from dotenv import load_dotenv
 
-import jwt
-import datetime
+load_dotenv()
 
-def generate_auth_token():
+secret_env = os.getenv("JWT_SECRET_KEY", "defaultJWTSECRETKEYFORTESTING2543676897jiohu")
 
-    time_now = datetime.datetime.now()
-    expiry_time = time_now + datetime.timedelta(hours=1)
+try:
+    SECRET_KEY = base64.b64decode(secret_env)
+except Exception:
+    SECRET_KEY = secret_env
 
-    secret = ""
-    decoded_secret = base64.b64decode(secret)
+ALGORITHM = "HS256"
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-    payload = {
-        "sub": "forecast_service",
-        "role": "INTERNAL",
-        "iat": time_now,
-        "exp": expiry_time,
-    }
 
-    token = jwt.encode(payload, decoded_secret, algorithm="HS256")
-    return token
+def get_current_vendor_id(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
+        vendor_id: str = payload.get("sub")
+
+        if vendor_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token is valid, but it has no User ID inside it."
+            )
+
+        return vendor_id
+
+    except JWTError as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Auth Failed: {str(e)}"
+        )
