@@ -8,10 +8,10 @@ from datetime import datetime, timedelta, time
 RANDOM_SEED = 12
 random.seed(RANDOM_SEED)
 
-VENDORS = pd.read_csv("database/vendors.csv")
-PRODUCTS = pd.read_csv("database/products.csv")
-VENDOR_CATEGORIES = pd.read_csv("database/categories.csv")
-OPENING_HOURS = pd.read_csv("database/opening_hours.csv")
+VENDORS = pd.read_csv("database_files/vendors.csv")
+PRODUCTS = pd.read_csv("database_files/products.csv")
+VENDOR_CATEGORIES = pd.read_csv("database_files/categories.csv")
+OPENING_HOURS = pd.read_csv("database_files/opening_hours.csv")
 
 CATEGORY_MAP = {
     'BREAD_BAKED_GOODS': 'Bread & Baked Goods',
@@ -156,8 +156,8 @@ def generate_bundles(num_bundles=25000):
     bundles_products_df = pd.DataFrame(bundle_products_list)
 
     print(f"Generated {len(bundles_df)} bundles.")
-    bundles_df.to_csv("database/bundles.csv", index=False)
-    bundles_products_df.to_csv("database/bundles_products.csv", index=False)
+    bundles_df.to_csv("database_files/bundles.csv", index=False)
+    bundles_products_df.to_csv("database_files/bundles_products.csv", index=False)
 
 
 if __name__ == "__main__":

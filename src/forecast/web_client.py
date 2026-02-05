@@ -1,6 +1,7 @@
 import csv
 
 import requests
+import ast
 
 from src.forecast.auth import generate_auth_token
 
@@ -22,38 +23,50 @@ def send_data(endpoint_url, data):
 
 if __name__ == "__main__":
 
-    # BUNDLES
-    with open('../../data_seeding/database/bundles_with_products.csv', mode='r', encoding='utf-8') as file:
+    # USERS
+    with open('../../data_seeding/database_seeding_files/users_seeding.csv', mode='r', encoding='utf-8') as file:
         csv_reader = csv.DictReader(file)
         data = list(csv_reader)
 
-        for d in data:
-            d["allergyTypes"] = []
+    send_data("users/internal", data)
 
-    send_data("bundles/internal", data)
-
-    # USERS
-    # with open('../../data_seeding/database/users.csv', mode='r', encoding='utf-8') as file:
+    # RESERVATIONS
+    # with open('../../data_seeding/database_seeding_files/reservations_seeding.csv', mode='r', encoding='utf-8') as file:
     #     csv_reader = csv.DictReader(file)
     #     data = list(csv_reader)
     #
-    # send_data("users/internal", data)
+    # for i in range(0, len(data), 1000):
+    #     batch = data[i:i + 1000]
+    #     send_data("reservations/internal", batch)
+
+    # BUNDLES
+    # with open('../../data_seeding/database_seeding_files/bundles_seeding.csv', mode='r', encoding='utf-8') as file:
+    #     csv_reader = csv.DictReader(file)
+    #     data = list(csv_reader)
+    #
+    #     for d in data:
+    #         d["allergyTypes"] = ast.literal_eval(d["allergyTypes"])
+    #         d["productIds"] = ast.literal_eval(d["productIds"]) #CSV's cannot store lists
+    #
+    #     for i in range(0, len(data), 1000):
+    #         batch = data[i:i + 1000]
+    #         send_data("bundles/internal", batch)
 
 
     # VENDORS
-    # with open('../../data_seeding/database/vendors.csv', mode='r', encoding='utf-8') as file:
+    # with open('../../data_seeding/database_seeding_files/vendors_seeding.csv', mode='r', encoding='utf-8') as file:
     #     csv_reader = csv.DictReader(file)
     #     data = list(csv_reader)
     #
     # send_data("vendors/internal", data)
 
     # PRODUCTS
-    # with open('../../data_seeding/database/vendors_products.csv', mode='r', encoding='utf-8') as file:
+    # with open('../../data_seeding/database_seeding_files/products_seeding.csv', mode='r', encoding='utf-8') as file:
     #     csv_reader = csv.DictReader(file)
     #     data = list(csv_reader)
     #
     #     for d in data:
-    #         d["allergies"] = []
+    #         d["allergies"] = ast.literal_eval(d["allergies"])
     #
     # send_data("products/internal", data)
 

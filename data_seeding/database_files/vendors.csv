@@ -1,0 +1,26 @@
+vendor_id,name,street_address,postcode,category,phone_number,email,password
+2f2530fe-56a0-4069-b06d-83a578929129,Greenfield Market,Prince Charles Road,EX4 7BY,SUPERMARKET,07368 758207,support@greenfieldmarket.co.uk,SD67F
+4d70cd26-6337-45aa-8a8e-6ee2a45c9267,Oaktree Foods,Exhibition Way,EX4 8JD,SUPERMARKET,07565 042131,support@oaktreefoods.co.uk,SDF78
+ba358b7b-355f-4942-b1c5-222a5b8efef0,MeadowMart,Russel Way,EX2 7EZ,SUPERMARKET,07323 984289,support@meadowmart.co.uk,CVB87
+046a72cd-ba93-439a-9d76-80adb8250be0,Fresh Harvest,1 Hill Barton Road,EX1 3PF,SUPERMARKET,07501 681396,support@freshharvest.co.uk,8DF97
+92233ce5-e0d1-47b1-9722-00d0c4d9996c,Riverbank Supermarket,Alphington Road,EX2 8NH,SUPERMARKET,07838 875617,support@riverbanksupermarket.co.uk,8X79C
+c8889f66-3499-4abc-80a1-2f5757cd0550,Hiltop Heights,98 Beacon Lane,EX4 8LU,SUPERMARKET,07984 583820,support@hiltopheights.co.uk,NM321
+8da7113a-8d38-4500-bc1d-2280b1ae3ce2,Bean & Brew,Rydon Lane Retail Park,EX2 7HX,CAFE,07986 880438,support@beanandbrew.co.uk,MF546
+f8f749f2-068d-4027-be98-02090d4f36fe,Morning Start Cafe,Honiton Road,EX1 3RU,CAFE,07341 939398,support@morningstartcafe.co.uk,8ZX76
+0085a9a8-b124-44e7-8cb3-141046bc183e,Blackbean Cafe,70-71 High Street,EX4 3DT,CAFE,07185 235694,support@blackbeancafe.co.uk,KJ2Hl
+9ab7d98a-a260-46ec-8aab-d3235a493e22,Coffee & Go,Michael House High Street,EX4 3PZ,CAFE,07371 195361,support@coffeeandgo.co.uk,23GHF
+517f0db2-bb8d-4b33-a1d5-ca8ada4dc130,Jamie's Bakery,1A Commins Road,EX1 2QB,BAKERY,07198 007658,support@jamiesbakery.co.uk,JHK57
+1a07fa2b-b9e1-44cc-938c-88534eacef52,Azure Bakery,8 Pamela Road,EX1 2UF,BAKERY,07476 270854,support@azurebakery.co.uk,HJK34
+1a81370b-d2b9-4cb1-badc-6b7a4612a69a,The Farmer's Dog,Longbrook Street,EX4 6AB,RESTAURANT,07955 243223,support@thefarmersdog.co.uk,7C8V9
+22c4d814-1516-45f9-9354-3640c8e65f07,The Bull,Prince Charles Road,EX4 7BZ,RESTAURANT,07613 506406,support@thebull.co.uk,V2CB4
+e27daa6e-3e67-4d51-8ac0-cc73c621fd40,The Royal Oak,270 Pinhoe Road,EX4 7JQ,RESTAURANT,07938 856705,support@theroyaloak.co.uk,56NVB
+dfc9a97b-0ac4-43cf-9169-040389892f81,The Bladebone,Mount Pleasant Road,EX4 7AB,RESTAURANT,07623 481637,support@thebladebone.co.uk,4576C
+b2a96f86-86a1-4b87-b406-23e8d789c14b,Grill King,Exe Bridges Retail Park,EX4 1AH,FAST_FOOD,07169 112498,support@grillking.co.uk,HJG23
+c3d3af36-d366-482c-944f-ee9d88205a02,Grab & Go,190 High Street,EX4 3DU,FAST_FOOD,07861 700485,support@grabandgo.co.uk,45JHK
+56950fba-9693-4032-a977-f931c78ac77d,Sweat Rings,16 The Guildhall Shopping Centre,EX4 3HP,DESSERT_SHOP,07621 300970,support@sweatrings.co.uk,908SD
+3cdd20b4-f7cd-40a4-8004-f816ec230b1a,Delectable Deserts,142 Sidwell Street,EX4 6RT,DESSERT_SHOP,07131 328391,support@delectabledeserts.co.uk,HGJ23
+953b29b3-d8c6-42da-a4ea-fa6732d705a5,Al's Desserts,40 High Street,EX4 3HP,DESSERT_SHOP,07498 104879,support@alsdesserts.co.uk,09ASD
+fa4c555e-72f6-4d8c-8ab2-8b9f2a592993,TSB,Unit 8 The Depot,EX1 2FW,SMOOTHIE_BAR,07754 771499,support@tsb.co.uk,1233H
+224ac6b1-9c09-4247-bb31-1f3a65903eb3,Juice Junction,44 Queen Street,EX4 3SR,SMOOTHIE_BAR,07547 454905,support@juicejunction.co.uk,GJHKG
+412bf86d-6c5e-40b4-94ac-403cc110a119,Twins Breakfast Bar,Kiosk 2 The Guildhall Shopping Centre,EX4 3HP,BREAKFAST_BAR,07673 669436,support@twinsbreakfastbar.co.uk,234BK
+80c0fe78-5e8d-4a07-a571-11013f3dac9c,Willow's,32-33 Gandy Street,EX4 3LS,BREAKFAST_BAR,07723 351169,support@willows.co.uk,234JKD

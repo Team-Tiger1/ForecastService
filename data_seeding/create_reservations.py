@@ -9,8 +9,8 @@ RANDOM_SEED = 12
 random.seed(RANDOM_SEED)
 
 WEATHER = pd.read_csv('weather_files/weather_data_exeter.csv')
-BUNDLES = pd.read_csv('database/bundles.csv')
-USERS = pd.read_csv('database/users.csv')
+BUNDLES = pd.read_csv('database_files/bundles.csv')
+USERS = pd.read_csv('database_files/users.csv')
 
 NORMALISED_CATEGORIES = pd.read_csv('normalisation_files/categories.csv')
 NORMALISED_WEATHER = pd.read_csv('normalisation_files/weather.csv')
@@ -203,7 +203,7 @@ def generate_reservations():
     dataset_df.to_csv('dataset/dataset.csv', index=False)
 
     reservations_df = pd.DataFrame(reservations)
-    reservations_df.to_csv('database/reservations.csv', index=False)
+    reservations_df.to_csv('database_files/reservations.csv', index=False)
     print(f"Generated {len(reservations_df)} reservations")
 
 
