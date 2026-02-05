@@ -2,8 +2,8 @@ from collections import defaultdict
 import pandas as pd
 
 # Load data
-USERS = pd.read_csv('database/users.csv')
-RESERVATIONS = pd.read_csv('database/reservations.csv')
+USERS = pd.read_csv('database_files/users.csv')
+RESERVATIONS = pd.read_csv('database_files/reservations.csv')
 SUCCESSFUL_COLLECTIONS = RESERVATIONS[RESERVATIONS['collection_status'] == "COLLECTED"]
 
 LATEST_DATE = pd.Timestamp("2026-01-15")
@@ -65,7 +65,7 @@ def add_streaks():
     USERS['date_last_collection'] = dates
 
     print(f"Created user streaks for {len(USERS)} users.")
-    USERS.to_csv('database/users.csv', index=False)
+    USERS.to_csv('database_files/users.csv', index=False)
 
 
 if __name__ == '__main__':

@@ -6,12 +6,12 @@ import pandas as pd
 RANDOM_SEED = 12
 random.seed(RANDOM_SEED)
 
-RESERVATIONS = pd.read_csv("database/reservations.csv")
-USERS = pd.read_csv("database/users.csv")
-VENDORS = pd.read_csv("database/vendors.csv")
+RESERVATIONS = pd.read_csv("database_files/reservations.csv")
+USERS = pd.read_csv("database_files/users.csv")
+VENDORS = pd.read_csv("database_files/vendors.csv")
 
-BUNDLES = pd.read_csv("database/bundles.csv")
-BUNDLES_PRODUCTS = pd.read_csv("database/bundles_products.csv")
+BUNDLES = pd.read_csv("database_files/bundles.csv")
+BUNDLES_PRODUCTS = pd.read_csv("database_files/bundles_products.csv")
 
 
 def simulate_dispute(reservation_id):
@@ -84,7 +84,7 @@ def generate_disputes():
 
     disputes_df = pd.DataFrame(disputes_list)
     print(f"Generated {len(disputes_df)} disputes.")
-    disputes_df.to_csv("database/disputes.csv", index=False)
+    disputes_df.to_csv("database_files/disputes.csv", index=False)
 
 if __name__ == "__main__":
     generate_disputes()
