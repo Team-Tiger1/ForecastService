@@ -4,6 +4,7 @@ import pandas as pd
 import math
 import random
 from datetime import datetime
+from pathlib import Path
 
 RANDOM_SEED = 12
 random.seed(RANDOM_SEED)
@@ -67,7 +68,7 @@ def calculate_decision(bundle, weights, threshold, create_dataset_entry=False):
     discount = max(0, (retail_price - price) / retail_price)
     lead_time_hrs = (start_datetime - post_datetime).total_seconds() / 3600
     window_length_hrs = (end_datetime - start_datetime).total_seconds() / 3600
-    pickup_hour = start_datetime.hour + (start_datetime.minute / 60)
+    pickup_hour = start_datetime.hour
     is_weekend = start_datetime.weekday() >= 5
 
     weather = WEATHER[WEATHER['date'] == date].iloc[0]
@@ -200,7 +201,10 @@ def generate_reservations():
             reservations.append(reservation)
 
     dataset_df = pd.DataFrame(dataset)
-    dataset_df.to_csv('dataset/dataset.csv', index=False)
+    current_dir = Path(__file__).resolve().parent
+    target_dir = current_dir.parent / 'src' / 'ml'
+    file_path = target_dir / 'ml.csv'
+    dataset_df.to_csv(file_path, index=False)
 
     reservations_df = pd.DataFrame(reservations)
     reservations_df.to_csv('database_files/reservations.csv', index=False)
