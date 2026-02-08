@@ -1,5 +1,4 @@
 import os
-import base64
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
@@ -7,12 +6,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-secret_env = os.getenv("JWT_SECRET_KEY", "defaultJWTSECRETKEYFORTESTING2543676897jiohu")
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
-try:
-    SECRET_KEY = base64.b64decode(secret_env)
-except Exception:
-    SECRET_KEY = secret_env
+if not SECRET_KEY:
+    SECRET_KEY = "secret"
 
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -21,7 +18,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 def get_current_vendor_id(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-
         vendor_id: str = payload.get("sub")
 
         if vendor_id is None:

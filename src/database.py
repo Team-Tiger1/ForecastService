@@ -5,11 +5,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DB_USER = os.getenv("DB_USER", "admin")
+DB_USER = os.getenv("DB_USER")
 
-DB_PASSWORD = os.getenv("DB_PASSWORD", "DataBaseTeamProject2")
-DB_HOST = os.getenv("DB_HOST", "192.168.0.151")
-DB_NAME = os.getenv("DB_NAME", "thelastfork_db")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_NAME = os.getenv("DB_NAME")
 
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}"
 

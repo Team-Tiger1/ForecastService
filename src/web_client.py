@@ -1,9 +1,8 @@
 import csv
 
 import requests
-import ast
 
-from src.forecast.auth import generate_auth_token
+from src.auth import generate_auth_token
 
 
 def send_data(endpoint_url, data):
@@ -24,7 +23,7 @@ def send_data(endpoint_url, data):
 if __name__ == "__main__":
 
     # USERS
-    with open('../../data_seeding/database_seeding_files/users_seeding.csv', mode='r', encoding='utf-8') as file:
+    with open('../data_seeding/database_seeding_files/users_seeding.csv', mode='r', encoding='utf-8') as file:
         csv_reader = csv.DictReader(file)
         data = list(csv_reader)
 
