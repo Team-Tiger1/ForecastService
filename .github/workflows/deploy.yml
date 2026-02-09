@@ -14,21 +14,6 @@ env:
 jobs:
   build-and-deploy:
     runs-on: self-hosted
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: user
-          POSTGRES_PASSWORD: test-password
-          POSTGRES_DB: test_db
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - uses: actions/checkout@v4
 
@@ -50,7 +35,7 @@ jobs:
           poetry install
 
       - name: Run FastApi Pytest Tests
-        run: poetry run pytest -vv -s
+        run: poetry run pytest
         env:
           JWT_SECRET_KEY: "test-secret-key-for-ci-pipeline"
           DB_PASSWORD: "test-password"
