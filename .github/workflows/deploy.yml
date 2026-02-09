@@ -27,6 +27,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          poetry env use 3.12
           poetry lock
           poetry install
 
