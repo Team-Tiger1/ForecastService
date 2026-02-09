@@ -5,7 +5,7 @@ from jose import jwt
 from fastapi.testclient import TestClient
 from src.main import app
 
-client = TestClient(app)
+client = TestClient(app, raise_server_exceptions=True)
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 if not SECRET_KEY:
