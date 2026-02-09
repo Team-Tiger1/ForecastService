@@ -5,7 +5,7 @@ from jose import jwt
 from fastapi.testclient import TestClient
 from src.main import app
 
-client = TestClient(app, raise_server_exceptions=True)
+client = TestClient(app)
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 if not SECRET_KEY:
@@ -43,6 +43,9 @@ def test_forecast_bundle_id(token):
         "Content-Type": "application/json"
     }
     response = client.get(f"/forecast/predict/{BUNDLE_ID}", headers=headers)
+    if response.status_code != 200:
+        print("test_forecast_bundle_id response:")
+        print(response.text)
     assert response.status_code == 200
     data = response.json()
     assert "reservation" in data
