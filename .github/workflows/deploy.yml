@@ -25,6 +25,9 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
 
+      - name: Delete old virtual env
+        run: rm -rf /home/user/.cache/pypoetry/virtualenvs/*
+
       - name: Install dependencies
         run: |
           poetry env use 3.12
