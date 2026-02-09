@@ -10,3 +10,4 @@ def test_health_check():
     assert response.status_code == 200
     assert response.json() == {"status": "ok", "message": "Forecast Service is running"}
 
+

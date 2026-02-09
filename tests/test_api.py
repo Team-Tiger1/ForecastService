@@ -23,6 +23,7 @@ def token():
     }
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
+
 @pytest.fixture
 def payload():
     return {
