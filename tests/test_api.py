@@ -2,7 +2,7 @@ import pytest
 import os
 import time
 from jose import jwt
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from fastapi.testclient import TestClient
 from src.main import app, get_db
 
@@ -17,7 +17,6 @@ BUNDLE_ID = "c283ce75-8fac-4f62-8842-546bb7d3a7b8"
 @pytest.fixture
 def mock_db_session():
     session = MagicMock()
-
     mock_data = {
         "bundle_id": BUNDLE_ID,
         "vendor_id": VENDOR_ID,
@@ -29,11 +28,8 @@ def mock_db_session():
         "category": "DRINKS_BEVERAGES",
         "postcode": "SW1A 1AA",
         "name": "Test Vendor",
-        "weather": "Rain",
-        "temperature": 15.0
     }
     session.execute.return_value.mappings.return_value.first.return_value = mock_data
-
     app.dependency_overrides[get_db] = lambda: session
     yield session
     app.dependency_overrides.clear()
@@ -41,33 +37,24 @@ def mock_db_session():
 
 @pytest.fixture
 def token():
-    payload = {
-        "sub": VENDOR_ID,
-        "exp": time.time() + 3600
-    }
+    payload = {"sub": VENDOR_ID, "exp": time.time() + 3600}
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
 @pytest.fixture
 def payload():
     return {
-        "price": 11.0,
-        "discount": 1.0,
-        "lead_time": 5,
-        "window_length": 5.0,
-        "weather": "Heavy Rain",
-        "category": "DRINKS_BEVERAGES",
-        "day": "Monday",
-        "time_of_day": 15
+        "price": 11.0, "discount": 1.0, "lead_time": 5, "window_length": 5.0,
+        "weather": "Heavy Rain", "category": "DRINKS_BEVERAGES",
+        "day": "Monday", "time_of_day": 15
     }
 
 
 def test_forecast_bundle_id(token, mock_db_session):
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
-    }
-    response = client.get(f"/forecast/predict/{BUNDLE_ID}", headers=headers)
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+
+    with patch("src.main.get_current_weather", return_value=("Sunny", 25.0)):
+        response = client.get(f"/forecast/predict/{BUNDLE_ID}", headers=headers)
 
     assert response.status_code == 200
     data = response.json()
@@ -76,11 +63,10 @@ def test_forecast_bundle_id(token, mock_db_session):
 
 
 def test_forecast_simulation(token, payload, mock_db_session):
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
-    }
-    response = client.post("/forecast/simulate", json=payload, headers=headers)
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+
+    with patch("src.main.get_current_weather", return_value=("Rain", 15.0)):
+        response = client.post("/forecast/simulate", json=payload, headers=headers)
 
     assert response.status_code == 200
     data = response.json()
