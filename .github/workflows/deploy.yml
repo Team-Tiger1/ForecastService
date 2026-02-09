@@ -35,7 +35,7 @@ jobs:
           poetry install
 
       - name: Run FastApi Pytest Tests
-        run: poetry run pytest
+        run: poetry run pytest -vv -s
         env:
           JWT_SECRET_KEY: "test-secret-key-for-ci-pipeline"
           DB_PASSWORD: "test-password"
