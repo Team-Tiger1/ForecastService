@@ -8,7 +8,9 @@ load_dotenv()
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
+
 if not SECRET_KEY:
+    print("Not pulling jwt secret from enviornment variables ")
     SECRET_KEY = "secret"
 
 ALGORITHM = "HS256"
@@ -16,6 +18,13 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def get_current_vendor_id(token: str = Depends(oauth2_scheme)):
+
+    if(SECRET_KEY == "secret"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="JWT Token Not Being Pulled from enviornment variables"
+        )
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         vendor_id: str = payload.get("sub")
