@@ -15,8 +15,6 @@ if not SECRET_KEY:
     #Randomly Genorated Base 64
     SECRET_KEY = "bWV0YWxzb21ldGltZXNlbnNleW91b3RoZXJzaGlubmluZ2JyZWFrcG9wdWxhdGlvbnM="
 
-SECRET_KEY = base64.b64decode(SECRET_KEY.encode())
-
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
