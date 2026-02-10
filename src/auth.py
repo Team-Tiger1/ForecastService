@@ -12,7 +12,6 @@ load_dotenv()
 RAW_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "").strip()
 
 if not RAW_SECRET_KEY:
-    logger.warning("Not pulling jwt secret from environment variables. Using default.")
     RAW_SECRET_KEY = "bWV0YWxzb21ldGltZXNlbnNleW91b3RoZXJzaGlubmluZ2JyZWFrcG9wdWxhdGlvbnM="
 
 padded_key = RAW_SECRET_KEY + "=" * ((4 - len(RAW_SECRET_KEY) % 4) % 4)
@@ -20,7 +19,6 @@ padded_key = RAW_SECRET_KEY + "=" * ((4 - len(RAW_SECRET_KEY) % 4) % 4)
 try:
     SECRET_KEY = base64.b64decode(padded_key)
 except Exception as e:
-    logger.error(f"Failed to decode base64 secret key: {e}")
     raise
 
 ALGORITHM = "HS256"
