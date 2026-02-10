@@ -21,14 +21,16 @@ def get_current_vendor_id(token: str = Depends(oauth2_scheme)):
         vendor_id: str = payload.get("sub")
 
         if vendor_id is None:
+            print("Vendor_id is null")
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail="Token is valid, but it has no User ID inside it."
             )
-
         return vendor_id
 
     except JWTError as e:
+        print(e)
+        print("JWTERROR")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Auth Failed: {str(e)}"
