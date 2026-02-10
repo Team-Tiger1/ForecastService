@@ -3,10 +3,11 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from dotenv import load_dotenv
+import base64
 
 load_dotenv()
 
-SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+SECRET_KEY = base64.b64decode(os.getenv("JWT_SECRET_KEY"))
 
 
 if not SECRET_KEY:
