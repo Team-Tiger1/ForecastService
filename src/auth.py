@@ -15,6 +15,13 @@ if not SECRET_KEY:
     #Randomly Genorated Base 64
     SECRET_KEY = "bWV0YWxzb21ldGltZXNlbnNleW91b3RoZXJzaGlubmluZ2JyZWFrcG9wdWxhdGlvbnM="
 
+padded_key = SECRET_KEY
+missing_padding = len(padded_key) % 4
+if missing_padding:
+    padded_key += "=" * (4 - missing_padding)
+
+SECRET_KEY = base64.b64decode(padded_key)
+
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
