@@ -37,7 +37,7 @@ jobs:
       - name: Run FastApi Pytest Tests
         run: poetry run pytest
         env:
-          JWT_SECRET_KEY: "test-secret-key-for-ci-pipeline"
+          JWT_SECRET_KEY: "dGVzdC1zZWNyZXQta2V5LWZvci1jaS1waXBlbGluZQ=="
           DB_PASSWORD: "test-password"
           DB_HOST: "localhost"
 
