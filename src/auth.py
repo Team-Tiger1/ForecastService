@@ -12,7 +12,8 @@ SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
 if not SECRET_KEY:
     print("Not pulling jwt secret from enviornment variables ")
-    SECRET_KEY = "secret=="
+    #Randomly Genorated Base 64
+    SECRET_KEY = "bWV0YWxzb21ldGltZXNlbnNleW91b3RoZXJzaGlubmluZ2JyZWFrcG9wdWxhdGlvbnM="
 
 SECRET_KEY = base64.b64decode(SECRET_KEY)
 
