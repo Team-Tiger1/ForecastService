@@ -12,7 +12,7 @@ SECRET_KEY = base64.b64decode(os.getenv("JWT_SECRET_KEY"))
 
 if not SECRET_KEY:
     print("Not pulling jwt secret from enviornment variables ")
-    SECRET_KEY = "secret"
+    SECRET_KEY = "secret=="
 
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
