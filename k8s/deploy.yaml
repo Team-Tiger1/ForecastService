@@ -28,6 +28,12 @@ spec:
                   name: gateway-secrets
                   key: jwt-secret
 
+            - name: WEATHER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secrets
+                  key: weather-api-key
+
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
