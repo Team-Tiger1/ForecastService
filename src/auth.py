@@ -1,37 +1,37 @@
 import os
+import base64
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+import jwt
+from jwt.exceptions import InvalidTokenError
 from dotenv import load_dotenv
-import base64
 
 load_dotenv()
 
-SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
+RAW_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "").strip()
 
-if not SECRET_KEY:
-    print("Not pulling jwt secret from enviornment variables ")
-    #Randomly Genorated Base 64
-    SECRET_KEY = "bWV0YWxzb21ldGltZXNlbnNleW91b3RoZXJzaGlubmluZ2JyZWFrcG9wdWxhdGlvbnM="
+if not RAW_SECRET_KEY:
+    logger.warning("Not pulling jwt secret from environment variables. Using default.")
+    RAW_SECRET_KEY = "bWV0YWxzb21ldGltZXNlbnNleW91b3RoZXJzaGlubmluZ2JyZWFrcG9wdWxhdGlvbnM="
 
-padded_key = SECRET_KEY
-missing_padding = len(padded_key) % 4
-if missing_padding:
-    padded_key += "=" * (4 - missing_padding)
+padded_key = RAW_SECRET_KEY + "=" * ((4 - len(RAW_SECRET_KEY) % 4) % 4)
 
-SECRET_KEY = base64.b64decode(padded_key)
+try:
+    SECRET_KEY = base64.b64decode(padded_key)
+except Exception as e:
+    logger.error(f"Failed to decode base64 secret key: {e}")
+    raise
 
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def get_current_vendor_id(token: str = Depends(oauth2_scheme)):
-
-    if(SECRET_KEY == "secret"):
+    if RAW_SECRET_KEY == "secret":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="JWT Token Not Being Pulled from enviornment variables"
+            detail="JWT Token Not Being Pulled from environment variables"
         )
 
     try:
@@ -39,17 +39,15 @@ def get_current_vendor_id(token: str = Depends(oauth2_scheme)):
         vendor_id: str = payload.get("sub")
 
         if vendor_id is None:
-            print("Vendor_id is null")
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail="Token is valid, but it has no User ID inside it."
             )
         return vendor_id
 
-    except JWTError as e:
-        print(e)
-        print("JWTERROR")
+    except InvalidTokenError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Auth Failed: {str(e)}"
+            detail=f"Auth Failed: Invalid token or signature",
+            headers={"WWW-Authenticate": "Bearer"},
         )
