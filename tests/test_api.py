@@ -47,7 +47,7 @@ def payload():
 def test_forecast_bundle_id(token, mock_db_session):
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
 
-    with patch("src.services.get_current_weather", return_value=("Sunny", 25.0)):
+    with patch("src.main.get_current_weather", return_value=("Sunny", 25.0)):
         response = client.get(f"/forecast/predict/{BUNDLE_ID}", headers=headers)
 
     assert response.status_code == 200
@@ -58,7 +58,7 @@ def test_forecast_bundle_id(token, mock_db_session):
 def test_forecast_simulation(token, payload, mock_db_session):
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
 
-    with patch("src.services.get_current_weather", return_value=("Rain", 15.0)):
+    with patch("src.main.get_current_weather", return_value=("Rain", 15.0)):
         response = client.post("/forecast/simulate", json=payload, headers=headers)
 
     assert response.status_code == 200

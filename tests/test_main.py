@@ -5,7 +5,7 @@ client = TestClient(app)
 
 
 def test_health_check():
-    response = client.get("/forecast")
+    response = client.get("/forecast/actuator")
 
     assert response.status_code == 200
     assert response.json() == {"status": "ok", "message": "Forecast Service is running"}
