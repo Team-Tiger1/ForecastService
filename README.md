@@ -4,6 +4,10 @@
 
 ## Overview
 
+<p>
+  <img src="Architecture_ForecastService.png" alt="Project Logo" height="500px">
+</p>
+
 ## Documentation
 
 [![Swagger Docs](https://img.shields.io/badge/Swagger-OpenAPI%20Docs-85EA2D?style=for-the-badge&logo=openapi-initiative&logoColor=black)](https://thelastfork.shop/api/forecastservice/docs)
