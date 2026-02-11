@@ -176,19 +176,7 @@ def predict_bundle(
         return result
 
     except Exception as e:
-        error_msg = (
-            f"Prediction Failed: {e} | "
-            f"discount: {discount}, "
-            f"price: {float(bundle.get('price', 0.0))}, "
-            f"weather: {weather}, "
-            f"category: {bundle.get('category', 'Unknown')}, "
-            f"temperature: {temperature}, "
-            f"day: {collection_start.strftime('%A') if collection_start else 'Unknown'}, "
-            f"lead_time: {(collection_start - posting_time).total_seconds() / 3600 if collection_start and posting_time else 'Unknown'}, "
-            f"window_length: {(collection_end - collection_start).total_seconds() / 3600 if collection_end and collection_start else 'Unknown'}, "
-            f"time_of_day: {collection_start.hour if collection_start else 'Unknown'}"
-        )
-        raise HTTPException(status_code=500, detail=error_msg)
+        raise HTTPException(status_code=500, detail="Prediction Failed: {e}")
 
 
 @app.get("/forecast")
