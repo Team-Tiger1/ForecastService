@@ -148,5 +148,7 @@ go to https://pipx.pypa.io/stable/installation/
 - And Sorting out bug fixes and connections between each microservices to the forecast service and set up the connection to the postgre database
 - Helped with bug fixing of Auth and Forecast service
 
+<br>
+
 **Author: Daniel Jackson**
 - Used pip-licenses to check permissions of python module licenses (Software Inventory)
