@@ -5,6 +5,10 @@ client = TestClient(app)
 
 
 def test_health_check():
+    """
+    Tests the application can start and respond to a basic request.
+    """
+
     response = client.get("/forecast/actuator")
 
     assert response.status_code == 200
