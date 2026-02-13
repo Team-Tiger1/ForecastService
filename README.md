@@ -142,6 +142,7 @@ go to https://pipx.pypa.io/stable/installation/
 - Developed the Machine Learning training pipeline, including data preprocessing, feature engineering, and the training of the Gradient Boosting classifiers used for predicting reservations and collections
 - Built the Forecast Service API, using FastAPI to create the /predict and /simulate endpoints and authorised them using JWT Auth
 - Integrated the Weather API to fetch historical data for model training and real-time conditions for predicting reservations and collections
+- Co-Developed unit and integration tests using pytest and FastAPI TestClient with Jed Leas.
 
 <br>
 
@@ -149,8 +150,9 @@ go to https://pipx.pypa.io/stable/installation/
 
 - Setting up all CI/CD workflows to handle 
     1. Automatic testing on push of main branch on the forcast service repo
-  2. Automatic Deployment onto k3s with zero downtime on compleation of automatic testing so broken code wont make it to deployment
-- And Sorting out bug fixes and connections between each microservices to the forecast service and set up the connection to the postgre database
+  2. Automatic Deployment onto k3s with zero downtime on completion of automatic testing so broken code won't make it to deployment
+- And Sorting out bug fixes and connections between each microservice's to the forecast service and set up the connection to the postgre database
+- Co-Developed unit and integration tests using pytest and FastAPI TestClient with Alex Greasley.
 - Helped with bug fixing of Auth and Forecast service
 
 <br>
