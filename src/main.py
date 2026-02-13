@@ -74,7 +74,7 @@ def predict_bundle(
     :param bundle_id: ID of the bundle.
     :param vendor_id: ID of the vendor.
     :param db: Database session.
-    :return: A dictionary containing the forecast result for both reservation and collection.
+    :return: A nested dictionary containing the forecast result for both reservation and collection.
     :raises: HTTPException 500 if models cannot be loaded or if there is an error with accessing the database or if the prediction fails.
              HTTPException 404 if the bundle does not exist in the database.
     """
