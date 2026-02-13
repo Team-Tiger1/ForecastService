@@ -137,6 +137,11 @@ go to https://pipx.pypa.io/stable/installation/
 
 ## Contribution
 **Author: Alex Greasley**
+- Created the scripts used for generating seeded data, simulating realistic user behaviour to establish trends for the ML models
+- Wrote scripts that cleaned and denormalised relational data to prepare it for bulk transfer into the production database
+- Developed the Machine Learning training pipeline, including data preprocessing, feature engineering, and the training of the Gradient Boosting classifiers used for predicting reservations and collections
+- Built the Forecast Service API, using FastAPI to create the /predict and /simulate endpoints and authorised them using JWT Auth
+- Integrated the Weather API to fetch historical data for model training and real-time conditions for predicting reservations and collections
 
 <br>
 
