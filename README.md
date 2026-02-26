@@ -153,7 +153,7 @@ go to https://pipx.pypa.io/stable/installation/
   2. Automatic Deployment onto k3s with zero downtime on completion of automatic testing so broken code won't make it to deployment
 - And Sorting out bug fixes and connections between each microservice's to the forecast service and set up the connection to the postgre database
 - Co-Developed unit and integration tests using pytest and FastAPI TestClient with Alex Greasley.
-- Helped with bug fixing of Auth and Forecast service
+- Helped with bug fixing of Auth and Forecast service.
 
 <br>
 
