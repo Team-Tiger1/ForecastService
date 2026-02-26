@@ -78,6 +78,12 @@ def get_current_weather(vendor_id, db):
     try:
         # Gets the weather for the vendors location using the weather API
         api_key = os.getenv("WEATHER_API_KEY")
+        
+        # For local deployment if no api key is provided
+        if not api_key:
+            # Return mock data
+            return "Sunny", 20.0
+        
         postcode = postcode['postcode']
         url = f"https://api.weatherapi.com/v1/current.json?key={api_key}&q={postcode}"
 
