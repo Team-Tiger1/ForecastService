@@ -7,13 +7,21 @@ readme = "README.md"
 package-mode = false
 
 [tool.poetry.dependencies]
+<<<<<<< HEAD
 python = "^3.12"
+=======
+python = "^3.11"
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
 fastapi = "^0.109.0"
 uvicorn = "^0.27.0"
 scikit-learn = "1.7.1"
 pandas = "^2.2.0"
 sqlalchemy = "^2.0.46"
 psycopg2-binary = "^2.9.11"
+<<<<<<< HEAD
+=======
+python-jose = "^3.5.0"
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
 python-multipart = "0.0.6"
 python-dotenv = "^1.2.1"
 requests = "^2.32.5"

@@ -9,13 +9,19 @@ from datetime import datetime, timedelta, time
 RANDOM_SEED = 12
 random.seed(RANDOM_SEED)
 
+<<<<<<< HEAD
 # Load needed datasets
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
 VENDORS = pd.read_csv("database_files/vendors.csv")
 PRODUCTS = pd.read_csv("database_files/products.csv")
 VENDOR_CATEGORIES = pd.read_csv("database_files/categories.csv")
 OPENING_HOURS = pd.read_csv("database_files/opening_hours.csv")
 
+<<<<<<< HEAD
 # Map category name to readable format for users
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
 CATEGORY_MAP = {
     'BREAD_BAKED_GOODS': 'Bread & Baked Goods',
     'SWEET_TREATS_DESSERTS': 'Sweet Treats & Desserts',
@@ -118,12 +124,20 @@ def pick_posting_and_pickup_time(vendor_id, day_of_week, date):
     posting_time_minutes = int((posting_time_float - posting_time_hour) * 60)
     posting_time_seconds = int(((posting_time_float - posting_time_hour) * 60 - posting_time_minutes) * 60)
 
+<<<<<<< HEAD
     # Combine the date with HMS times
     posting_datetime = datetime.combine(date, time(hour=posting_time_hour, minute=posting_time_minutes, second=posting_time_seconds))
     pickup_start_datetime = datetime.combine(date, time(hour=pickup_start_hour))
     pickup_end_datetime = datetime.combine(date, time(hour=pickup_end_hour))
 
     # Converts datetime times into ISO format times
+=======
+    posting_datetime = datetime.combine(date, time(hour=posting_time_hour, minute=posting_time_minutes,
+                                                   second=posting_time_seconds))
+    pickup_start_datetime = datetime.combine(date, time(hour=pickup_start_hour))
+    pickup_end_datetime = datetime.combine(date, time(hour=pickup_end_hour))
+
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     posting_time = posting_datetime.isoformat()
     pickup_start = pickup_start_datetime.isoformat()
     pickup_end = pickup_end_datetime.isoformat()
@@ -151,14 +165,20 @@ def simulate_bundle():
 
     picked_products, retail_price = pick_products(vendor_id, category)
 
+<<<<<<< HEAD
     # Randomly pick a discount between 25% and 75% and apply it to retail_price
     price = round(retail_price * random.uniform(0.25, 0.75), 2)
 
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     posting_time, pickup_start, pickup_end = pick_posting_and_pickup_time(vendor_id, day_of_week, date)
 
     bundle_id = str(uuid.uuid4())
 
+<<<<<<< HEAD
     # Adds bundle_id to each record in the picked_products list and adds the data to a dictionary
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     bundles_products = []
     total_products = 0
     for product in picked_products:
@@ -189,11 +209,14 @@ def simulate_bundle():
 
 
 def generate_bundles(num_bundles=25000):
+<<<<<<< HEAD
     """
     Generates N bundles and saves them to a CSV file.
     :param num_bundles: The number of bundles to generate.
     """
 
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     print("Generating Bundles...")
 
     bundles_list = []

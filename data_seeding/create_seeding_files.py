@@ -2,32 +2,49 @@ import pandas as pd
 
 
 def generate_vendors_seeding():
+<<<<<<< HEAD
     """
     Prepares Vendors table for seeding the Database. Renames columns to match required formats.
     """
     vendors = pd.read_csv("database_files/vendors.csv")
     vendors_seeding = vendors.copy()
     vendors_seeding = vendors_seeding.rename(columns={'vendor_id': 'vendorId', 'street_address': 'streetAddress', 'phone_number': 'phoneNumber'})
+=======
+    vendors = pd.read_csv("database_files/vendors.csv")
+    vendors_seeding = vendors.copy()
+    vendors_seeding = vendors_seeding.rename(
+        columns={'vendor_id': 'vendorId', 'street_address': 'streetAddress', 'phone_number': 'phoneNumber'})
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     vendors_seeding.to_csv('database_seeding_files/vendors_seeding.csv', index=False)
 
 
 def generate_users_seeding():
+<<<<<<< HEAD
     """
     Prepares Users table for seeding the Database. Renames columns to match required formats.
     """
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     users = pd.read_csv("database_files/users.csv")
     users_seeding = users.copy()
     users_seeding = users_seeding.rename(columns={
         'user_id': 'userId',
         'date_last_collection': 'lastReservationTime'
     })
+<<<<<<< HEAD
+=======
+    users_seeding = users_seeding.drop(columns=['username'])
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     users_seeding.to_csv('database_seeding_files/users_seeding.csv', index=False)
 
 
 def generate_reservations_seeding():
+<<<<<<< HEAD
     """
     Prepares Reservations table for seeding the Database. Renames columns to match required formats.
     """
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     reservations = pd.read_csv("database_files/reservations.csv")
     reservations_seeding = reservations.copy()
     reservations_seeding = reservations_seeding.rename(columns={
@@ -38,11 +55,16 @@ def generate_reservations_seeding():
         'reservation_time': 'timeReserved',
         'collection_time': 'timeCollected',
     })
+<<<<<<< HEAD
     reservations_seeding = reservations_seeding.drop(columns=['amount_due']) # This is calculated using the product retail_price so is not needed in reservation table
+=======
+    reservations_seeding = reservations_seeding.drop(columns=['amount_due'])
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     reservations_seeding.to_csv('database_seeding_files/reservations_seeding.csv', index=False)
 
 
 def get_product_allergens(product_id, products_allergens, allergens):
+<<<<<<< HEAD
     """
     Helper function for getting allergens for a product.
     :param product_id: ID of product.
@@ -60,6 +82,13 @@ def get_product_allergens(product_id, products_allergens, allergens):
     allergens_list = []
 
     # Iterates each row of allergens adding the names to a list
+=======
+    if product_id not in products_allergens['product_id'].values:
+        return []
+
+    df = products_allergens[products_allergens['product_id'] == product_id]
+    allergens_list = []
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     for _, row in df.iterrows():
         allergen_id = row['allergen_id']
         allergen_name = allergens[allergens['allergen_id'] == allergen_id]['allergen_name'].iloc[0]
@@ -69,10 +98,13 @@ def get_product_allergens(product_id, products_allergens, allergens):
 
 
 def generate_products_seeding():
+<<<<<<< HEAD
     """
     Prepares Products table for seeding the Database. Renames columns to match required formats. Adds allergen column to products table.
     """
 
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     products = pd.read_csv("database_files/products.csv")
     products_allergens = pd.read_csv("database_files/products_allergens.csv")
     allergens = pd.read_csv("database_files/allergens.csv")
@@ -80,15 +112,22 @@ def generate_products_seeding():
     products_seeding = products.copy()
     all_products_allergens = []
 
+<<<<<<< HEAD
     # Iterates through each product adding each products allergen data to a list all_products_allergens
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     for _, row in products_seeding.iterrows():
         product_id = row['product_id']
         product_allergens = get_product_allergens(product_id, products_allergens, allergens)
         all_products_allergens.append(product_allergens)
 
+<<<<<<< HEAD
     # Adds the products allergens to each product row
     products_seeding['allergies'] = all_products_allergens
 
+=======
+    products_seeding['allergies'] = all_products_allergens
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     products_seeding = products_seeding.rename(columns={
         'product_id': 'productId',
         'vendor_id': 'vendorId',
@@ -99,6 +138,7 @@ def generate_products_seeding():
 
 
 def get_bundle_products(bundle_id, bundles_products):
+<<<<<<< HEAD
     """
     Helper function for getting products within a bundle.
     :param bundle_id: ID of bundle.
@@ -110,6 +150,10 @@ def get_bundle_products(bundle_id, bundles_products):
     product_ids_list = []
 
     # Iterates through each product and multiplies it by the quantity so product ID is in the list {quantity} times
+=======
+    df = bundles_products[bundles_products['bundle_id'] == bundle_id]
+    product_ids_list = []
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     for _, row in df.iterrows():
         product_ids_list.extend([row['product_id']] * row['quantity'])
 
@@ -117,10 +161,13 @@ def get_bundle_products(bundle_id, bundles_products):
 
 
 def generate_bundles_seeding():
+<<<<<<< HEAD
     """
     Prepares Bundles table for seeding the Database. Renames columns to match required formats. Adds allergen and products column.
     """
 
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     bundles = pd.read_csv("database_files/bundles.csv")
     bundles_products = pd.read_csv("database_files/bundles_products.csv")
     products_allergens = pd.read_csv("database_files/products_allergens.csv")
@@ -130,18 +177,27 @@ def generate_bundles_seeding():
     all_bundle_allergens = []
     all_bundle_products = []
 
+<<<<<<< HEAD
     # Iterates through each bundle in the bundle dataset
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     for _, row in bundles.iterrows():
         bundle_id = row['bundle_id']
         bundle_products = get_bundle_products(bundle_id, bundles_products)
 
+<<<<<<< HEAD
         # Get all the allergens for each product in the bundle
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
         bundle_allergens = []
         for product_id in bundle_products:
             product_allergens = get_product_allergens(product_id, products_allergens, allergens)
             bundle_allergens.extend(product_allergens)
 
+<<<<<<< HEAD
         # Removes duplicate allergens by converting the list of all allergens to a set and then back to a list
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
         bundle_allergens = list(set(bundle_allergens))
 
         all_bundle_products.append(bundle_products)

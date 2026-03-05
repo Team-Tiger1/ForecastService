@@ -1,6 +1,9 @@
 FROM python:3.12-slim
+<<<<<<< HEAD
 
 ENV PYTHONUNBUFFERED=1
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
 
 WORKDIR /app
 

@@ -6,12 +6,15 @@ from src.auth import generate_auth_token
 
 
 def send_data(endpoint_url, data):
+<<<<<<< HEAD
     """
     Helper function that sends bulk data to an endpoint to seed the database.
     :param endpoint_url: The endpoint url.
     :param data: The data to send.
     """
 
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     url = "https://thelastfork.shop/api/"
     secret = generate_auth_token()
     headers = {
@@ -19,7 +22,10 @@ def send_data(endpoint_url, data):
         "Content-Type": "application/json"
     }
 
+<<<<<<< HEAD
     # POST request sending the seeded data
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     response = requests.post(url + endpoint_url, json=data, headers=headers)
     if response.status_code == 204:
         print(f"Data successfully sent to {endpoint_url}")

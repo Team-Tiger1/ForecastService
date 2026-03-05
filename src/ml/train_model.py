@@ -6,31 +6,47 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, FunctionTransformer
 from sklearn.pipeline import Pipeline
 
+<<<<<<< HEAD
 # Load the training dataset
 df = pd.read_csv("dataset.csv")
 
 # Split the columns into 3 categories based on the data within them
+=======
+df = pd.read_csv("dataset.csv")
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
 categorical_columns = ['weather', 'category', 'day']
 skewed_columns = ['lead_time', 'window_length']
 numerical_columns = ['price', 'temperature', 'time_of_day']
 
+<<<<<<< HEAD
 # OneHotEncoder to convert categorical data into binary vectors
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
 categorical_pipeline = Pipeline([
     ('encoder', OneHotEncoder(sparse_output=False, handle_unknown='ignore'))
 ])
 
+<<<<<<< HEAD
 # Log transformation to compress the outliers
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
 skewed_pipeline = Pipeline([
     ('log', FunctionTransformer(np.log1p, validate=False)),
     ('scaler', StandardScaler())
 ])
 
+<<<<<<< HEAD
 # Standard Scaler used for normal numerical inputs
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
 numerical_pipeline = Pipeline([
     ('scaler', StandardScaler())
 ])
 
+<<<<<<< HEAD
 # Applies the specific pipelines to each category of data and then combines them into a single matrix
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
 preprocessor = ColumnTransformer(transformers=[
     ('categorical', categorical_pipeline, categorical_columns),
     ('skewed', skewed_pipeline, skewed_columns),
@@ -38,20 +54,27 @@ preprocessor = ColumnTransformer(transformers=[
 ], remainder='drop')
 
 def create_model_pipeline():
+<<<<<<< HEAD
     """
     Creates an ML pipeline combining preprocessing with the classifier.
     :return: A scikit-learn Pipeline object that can be used by the forecast service endpoint to predict reservation and collection outcomes.
     """
 
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     return Pipeline([
         ('preprocessor', preprocessor),
         ('classifier', GradientBoostingClassifier(n_estimators=300, learning_rate=0.05, max_depth=4, random_state=42))
     ])
 
+<<<<<<< HEAD
 # Removes the targets from the input features
 X = df.drop(['is_collected', 'is_reserved'], axis=1)
 
 # Target variables
+=======
+X = df.drop(['is_collected', 'is_reserved'], axis=1)
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
 y_reserved = df['is_reserved']
 y_collected = df['is_collected']
 
@@ -61,7 +84,10 @@ pipeline_reservation.fit(X, y_reserved)
 pipeline_collection = create_model_pipeline()
 pipeline_collection.fit(X, y_collected)
 
+<<<<<<< HEAD
 # Saves the entire ML pipeline to a single file
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
 joblib.dump(pipeline_reservation, 'pipeline_reservation.pkl')
 joblib.dump(pipeline_collection, 'pipeline_collection.pkl')
 print("Pipelines saved as 'pipeline_reservation.pkl' and 'pipeline_collection.pkl'")

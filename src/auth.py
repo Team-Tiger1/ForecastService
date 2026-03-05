@@ -1,4 +1,5 @@
 import os
+<<<<<<< HEAD
 import base64
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -24,12 +25,26 @@ try:
     SECRET_KEY = base64.b64decode(padded_key)
 except Exception as e:
     raise
+=======
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+from dotenv import load_dotenv
+
+load_dotenv()
+
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+
+if not SECRET_KEY:
+    SECRET_KEY = "secret"
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
 
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def get_current_vendor_id(token: str = Depends(oauth2_scheme)):
+<<<<<<< HEAD
     """
     FastAPI Dependency to validate the JWT string and extract the vendor ID.
     :param token: The JWT string.
@@ -64,4 +79,22 @@ def get_current_vendor_id(token: str = Depends(oauth2_scheme)):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Auth Failed: Invalid token or signature",
             headers={"WWW-Authenticate": "Bearer"},
+=======
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        vendor_id: str = payload.get("sub")
+
+        if vendor_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token is valid, but it has no User ID inside it."
+            )
+
+        return vendor_id
+
+    except JWTError as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Auth Failed: {str(e)}"
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
         )

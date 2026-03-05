@@ -10,63 +10,106 @@ from pathlib import Path
 RANDOM_SEED = 12
 random.seed(RANDOM_SEED)
 
+<<<<<<< HEAD
 # Load needed datasets
 WEATHER = pd.read_csv('weather_files/weather_data_exeter.csv.csv')
 BUNDLES = pd.read_csv('database_files/bundles.csv')
 USERS = pd.read_csv('database_files/users.csv')
+=======
+WEATHER = pd.read_csv('weather_files/weather_data_exeter.csv')
+BUNDLES = pd.read_csv('database_files/bundles.csv')
+USERS = pd.read_csv('database_files/users.csv')
+
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
 NORMALISED_CATEGORIES = pd.read_csv('normalisation_files/categories.csv')
 NORMALISED_WEATHER = pd.read_csv('normalisation_files/weather.csv')
 
 
 def normalise_price(price):
+<<<<<<< HEAD
     """
     Normalises price using exponential decay.
     :param price: The price to normalise.
     :return: Normalised price.
     """
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     return math.exp(-0.1 * price)
 
 
 def normalise_weather(condition):
+<<<<<<< HEAD
     """
     Uses the NORMALISED_WEATHER to normalise weather condition.
     :param condition: The weather condition to normalise.
     :return: Normalised weather condition.
     """
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     return NORMALISED_WEATHER.loc[NORMALISED_WEATHER['condition'] == condition, 'value'].values[0]
 
 
 def normalise_category(category):
+<<<<<<< HEAD
     """
     Uses the NORMALISED_CATEGORIES to normalise category.
     :param category: The category to normalise.
     :return: The normalised category.
     """
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     return NORMALISED_CATEGORIES.loc[NORMALISED_CATEGORIES['category'] == category, 'value'].values[0]
 
 
 def normalise_temperature(temp_c):
+<<<<<<< HEAD
     """
     Normalises temperature using gaussian distribution where 20 degrees is the optimal temperature.
     :param temp_c: The temperature to normalise.
     :return: The normalised temperature.
     """
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     optimal_temp = 20
     standard_deviation = 10
     return math.exp(-((temp_c - optimal_temp) ** 2) / (2 * (standard_deviation ** 2)))
 
 
 def normalise_lead_time(hours):
+<<<<<<< HEAD
     """
     Normalises lead time. The optimal lead time is between 1 and 4 hours. Lead times of less than 1 hour and more than 6 hours are less desirable.
     :param hours: The lead time to normalise.
     :return: The normalised lead time.
     """
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     if hours < 1: return 0.3
     if 1 <= hours <= 4: return 1.0
     if hours > 6: return 0.4
     return 0.6
 
+<<<<<<< HEAD
+=======
+
+def normalise_window_length(hours):
+    return min(1.0, hours / 4.0)
+
+
+def normalise_time_of_day(hour):
+    if 11 <= hour <= 14: return 1.0
+    if 17 <= hour <= 20: return 0.9
+    if 8 <= hour <= 10: return 0.6
+    if hour > 21: return 0.2
+    return 0.5
+
+
+def calculate_decision(bundle, weights, threshold, create_dataset_entry=False):
+    fmt = "%Y-%m-%dT%H:%M:%S"
+    post_datetime = datetime.strptime(bundle['posting_time'], fmt)
+    start_datetime = datetime.strptime(bundle['collection_start'], fmt)
+    end_datetime = datetime.strptime(bundle['collection_end'], fmt)
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
 
 def normalise_window_length(hours):
     """
@@ -111,19 +154,28 @@ def calculate_decision(bundle, weights, threshold, create_dataset_entry=False):
     category = bundle['category']
     date = start_datetime.strftime('%Y-%m-%d')
 
+<<<<<<< HEAD
     # Calculate the factors that are not found in the bundle dataset
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     discount = max(0, (retail_price - price) / retail_price)
     lead_time_hrs = (start_datetime - post_datetime).total_seconds() / 3600
     window_length_hrs = (end_datetime - start_datetime).total_seconds() / 3600
     pickup_hour = start_datetime.hour
     is_weekend = start_datetime.weekday() >= 5
 
+<<<<<<< HEAD
     # Get the weather condition and temperature from the saved weather csv file
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     weather = WEATHER[WEATHER['date'] == date].iloc[0]
     condition = weather['condition'].strip()
     temperature = weather['avgtemp_c']
 
+<<<<<<< HEAD
     # Normalise all the factors
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     normalised_discount = discount
     normalised_price = normalise_price(price)
     normalised_weather = normalise_weather(condition)
@@ -134,7 +186,10 @@ def calculate_decision(bundle, weights, threshold, create_dataset_entry=False):
     normalised_window_length = normalise_window_length(window_length_hrs)
     normalised_time_of_day = normalise_time_of_day(pickup_hour)
 
+<<<<<<< HEAD
     # Get the sum of multiplying all the normalised factors by their weights
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     score = (
             (normalised_discount * weights['discount']) +
             (normalised_price * weights['price']) +
@@ -147,7 +202,10 @@ def calculate_decision(bundle, weights, threshold, create_dataset_entry=False):
             (normalised_time_of_day * weights['time_of_day'])
     )
 
+<<<<<<< HEAD
     # Create a dictionary of the raw factors if create_dataset is true
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     if create_dataset_entry:
         dataset_entry = {
             'discount': discount,
@@ -167,6 +225,7 @@ def calculate_decision(bundle, weights, threshold, create_dataset_entry=False):
 
 
 def simulate_reservation(bundle, user_id):
+<<<<<<< HEAD
     """
     Simulates whether a given bundle will be reserved and then if it will be collected.
     :param bundle: The bundle.
@@ -207,16 +266,52 @@ def simulate_reservation(bundle, user_id):
     }
 
     # If the bundle is reserved the collection decision is then calculated
+=======
+    reservation_weights = {
+        'discount': 0.3,
+        'price': 0.15,
+        'weather': 0.15,
+        'lead_time': 0.1,
+        'temperature': 0.1,
+        'day_of_week': 0.05,
+        'window_length': 0.05,
+        'time_of_day': 0.05,
+        'category': 0.05
+    }
+
+    threshold = 0.5 + random.uniform(-0.05, 0.05)
+    is_reserved, dataset_entry = calculate_decision(bundle, reservation_weights, threshold, True)
+    dataset_entry['is_reserved'] = is_reserved
+
+    collection_weights = {
+        'weather': 0.3,
+        'temperature': 0.15,
+        'window_length': 0.15,
+        'day_of_week': 0.1,
+        'time_of_day': 0.1,
+        'lead_time': 0.05,
+        'discount': 0.05,
+        'price': 0.05,
+        'category': 0.05
+    }
+
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     if is_reserved:
         threshold = 0.5 + random.uniform(-0.05, 0.05)
         is_collected = calculate_decision(bundle, collection_weights, threshold, False)
         dataset_entry['is_collected'] = is_collected
     else:
+<<<<<<< HEAD
         # If the bundle is not reserved the function returns early and does not return an entry for the reservation dataset
         dataset_entry['is_collected'] = False
         return None, dataset_entry
 
     # If the collection decision is true the status is set to COLLECTED to match the enum used in the database
+=======
+        dataset_entry['is_collected'] = False
+        return None, dataset_entry
+
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     if is_collected:
         status = 'COLLECTED'
     else:
@@ -229,12 +324,20 @@ def simulate_reservation(bundle, user_id):
     collection_start_timestamp = datetime.fromisoformat(bundle['collection_start']).timestamp()
     collection_end_timestamp = datetime.fromisoformat(bundle['collection_end']).timestamp()
 
+<<<<<<< HEAD
     # A random reservation time is chosen between the posting time and collection end time
     reservation_time_unix = random.uniform(posting_timestamp, collection_end_timestamp - 3600)
     reservation_time = datetime.fromtimestamp(reservation_time_unix).isoformat()
 
     # A random collection time is chosen between the collection start time or reservation time and collection end time
     collection_time_unix = random.uniform(max(reservation_time_unix, collection_start_timestamp), collection_end_timestamp)
+=======
+    reservation_time_unix = random.uniform(posting_timestamp, collection_end_timestamp - 3600)
+    reservation_time = datetime.fromtimestamp(reservation_time_unix).isoformat()
+
+    collection_time_unix = random.uniform(max(reservation_time_unix, collection_start_timestamp),
+                                          collection_end_timestamp)
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     collection_time = datetime.fromtimestamp(collection_time_unix).isoformat()
 
     reservation = {
@@ -251,6 +354,7 @@ def simulate_reservation(bundle, user_id):
 
 
 def generate_reservations():
+<<<<<<< HEAD
     """
     Iterates through each bundle and simulates reservation and collections for each one
     """
@@ -263,17 +367,31 @@ def generate_reservations():
     dataset = []
 
     # Iterates through each bundle
+=======
+    print("Generating Reservations...")
+
+    users_list = USERS.to_dict('records')
+
+    reservations = []
+    dataset = []
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     for _, bundle in BUNDLES.iterrows():
         user_id = random.choice(users_list)['user_id']
         reservation, dataset_entry = simulate_reservation(bundle, user_id)
 
         dataset.append(dataset_entry)
 
+<<<<<<< HEAD
         # If a reservation occurs the reservation dictionary is added to the list of all reservations
         if reservation:
             reservations.append(reservation)
 
     # Converts list of dictionaries to dataframe
+=======
+        if reservation:
+            reservations.append(reservation)
+
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     dataset_df = pd.DataFrame(dataset)
     current_dir = Path(__file__).resolve().parent
     target_dir = current_dir.parent / 'src' / 'ml'

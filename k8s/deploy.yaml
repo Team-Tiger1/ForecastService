@@ -28,19 +28,26 @@ spec:
                   name: gateway-secrets
                   key: jwt-secret
 
+<<<<<<< HEAD
             - name: WEATHER_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: gateway-secrets
                   key: weather-api-key
 
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: gateway-secrets
                   key: db-password
             - name: DB_HOST
+<<<<<<< HEAD
               value: "192.168.0.225"
+=======
+              value: "192.168.0.151"
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
             - name: DB_USER
               value: "admin"
             - name: DB_NAME

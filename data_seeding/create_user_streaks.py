@@ -1,6 +1,7 @@
 from collections import defaultdict
 import pandas as pd
 
+<<<<<<< HEAD
 # Load needed datasets
 USERS = pd.read_csv('database_files/users.csv')
 RESERVATIONS = pd.read_csv('database_files/reservations.csv')
@@ -13,6 +14,16 @@ LATEST_DATE = pd.Timestamp("2026-01-15")
 LATEST_WEEK = LATEST_DATE.to_period('W')
 
 # Groups all a users collections dates together. Done here to improve efficiency.
+=======
+# Load data
+USERS = pd.read_csv('database_files/users.csv')
+RESERVATIONS = pd.read_csv('database_files/reservations.csv')
+SUCCESSFUL_COLLECTIONS = RESERVATIONS[RESERVATIONS['collection_status'] == "COLLECTED"]
+
+LATEST_DATE = pd.Timestamp("2026-01-15")
+LATEST_WEEK = LATEST_DATE.to_period('W')
+
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
 user_id_collection_dates = defaultdict(list)
 for _, row in SUCCESSFUL_COLLECTIONS.iterrows():
     user_id = row['user_id']
@@ -21,6 +32,7 @@ for _, row in SUCCESSFUL_COLLECTIONS.iterrows():
 
 
 def calculate_streak(user_collection_dates):
+<<<<<<< HEAD
     """
     Calculate the number of consecutive weeks a user has collected a bundle.
     :param user_collection_dates: List of datetime of every collection.
@@ -31,6 +43,9 @@ def calculate_streak(user_collection_dates):
     collection_weeks = [date.to_period('W') for date in user_collection_dates]
 
     # Sort in descending order and remove all duplicates
+=======
+    collection_weeks = [date.to_period('W') for date in user_collection_dates]
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     collection_weeks = sorted(list(set(collection_weeks)), reverse=True)
 
     if not collection_weeks:
@@ -38,11 +53,17 @@ def calculate_streak(user_collection_dates):
 
     latest_collection_week = collection_weeks[0]
 
+<<<<<<< HEAD
     # If the gap between the LATEST_WEEK and the users last collection is greater than 1 their streak is 0.
     if (LATEST_WEEK - latest_collection_week).n > 1:
         return 0
 
     # Counts the consecutive weeks a user made a collection
+=======
+    if (LATEST_WEEK - latest_collection_week).n > 1:
+        return 0
+
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     streak = 1
     for i in range(len(collection_weeks) - 1):
         if (collection_weeks[i] - collection_weeks[i + 1]).n == 1:
@@ -54,6 +75,7 @@ def calculate_streak(user_collection_dates):
 
 
 def get_streak(user_id):
+<<<<<<< HEAD
     """
     Gets the users streak and the date of their last collection.
     :param user_id: ID of the User.
@@ -68,6 +90,11 @@ def get_streak(user_id):
         return 0, None
 
     # If the user does have previous collections get their streak and the date of their last collection
+=======
+    user_collection_dates = user_id_collection_dates.get(user_id, [])
+    if not user_collection_dates:
+        return 0, None
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     else:
         streak = calculate_streak(user_collection_dates)
         date_last_collection = max(user_collection_dates).isoformat()
@@ -76,16 +103,22 @@ def get_streak(user_id):
 
 
 def add_streaks():
+<<<<<<< HEAD
     """
     Adds streaks and date of last collection to the User table.
     """
 
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     print("Creating User Streaks...")
 
     streaks = []
     dates = []
 
+<<<<<<< HEAD
     # Iterates through each user getting their streak and date of last collection
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     for _, row in USERS.iterrows():
         user_id = row['user_id']
         streak, date_last_collection = get_streak(user_id)

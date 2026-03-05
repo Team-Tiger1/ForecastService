@@ -3,6 +3,7 @@ import uuid
 
 import pandas as pd
 
+<<<<<<< HEAD
 # Set seed to ensure same results across runs
 RANDOM_SEED = 12
 random.seed(RANDOM_SEED)
@@ -11,11 +12,21 @@ random.seed(RANDOM_SEED)
 RESERVATIONS = pd.read_csv("database_files/reservations.csv")
 USERS = pd.read_csv("database_files/users.csv")
 VENDORS = pd.read_csv("database_files/vendors.csv")
+=======
+RANDOM_SEED = 12
+random.seed(RANDOM_SEED)
+
+RESERVATIONS = pd.read_csv("database_files/reservations.csv")
+USERS = pd.read_csv("database_files/users.csv")
+VENDORS = pd.read_csv("database_files/vendors.csv")
+
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
 BUNDLES = pd.read_csv("database_files/bundles.csv")
 BUNDLES_PRODUCTS = pd.read_csv("database_files/bundles_products.csv")
 
 
 def simulate_dispute(reservation_id):
+<<<<<<< HEAD
     """
     Generate a dispute based on a given reservation id.
     :param reservation_id: ID of the reservation.
@@ -36,6 +47,16 @@ def simulate_dispute(reservation_id):
     vendor_id = bundle['vendor_id']
 
     # Each different dispute scenario and a corresponding approval and deny response
+=======
+    reservation = RESERVATIONS[RESERVATIONS['reservation_id'] == reservation_id].iloc[0]
+    user_id = reservation['user_id']
+    bundle_id = reservation['bundle_id']
+    if BUNDLES[BUNDLES['bundle_id'] == bundle_id].empty:
+        print("BUNDLE ID NOT FOUND")
+    bundle = BUNDLES[BUNDLES['bundle_id'] == bundle_id].iloc[0]
+    vendor_id = bundle['vendor_id']
+
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     possible_disputes = {
         "missing_items": {
             "complaint": "I collected my bundle but there were missing items.",
@@ -64,11 +85,17 @@ def simulate_dispute(reservation_id):
         }
     }
 
+<<<<<<< HEAD
     # Randomly selects a dispute scenario
     random_dispute_key = random.choice(list(possible_disputes.keys()))
     chosen_dispute = possible_disputes[random_dispute_key]
 
     # 85% the vendor approves the dispute to ensure there is variety in the dispute table
+=======
+    random_dispute_key = random.choice(list(possible_disputes.keys()))
+    chosen_dispute = possible_disputes[random_dispute_key]
+
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     if random.random() < 0.15:
         status = "APPROVED"
         vendor_response = chosen_dispute['vendor_approve_response']
@@ -89,21 +116,30 @@ def simulate_dispute(reservation_id):
     return dispute
 
 def generate_disputes():
+<<<<<<< HEAD
     """
     Iterates through each reservation and generates a list of disputes for a subset of them.
     """
 
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     print("Generating disputes...")
     disputes_list = []
 
     for row in RESERVATIONS.itertuples():
+<<<<<<< HEAD
 
         # 37.5% chance of the reservation being disputed
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
         if random.random() < 0.375:
             dispute = simulate_dispute(row.reservation_id)
             disputes_list.append(dispute)
 
+<<<<<<< HEAD
     # Converts list of dictionaries to dataframe
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     disputes_df = pd.DataFrame(disputes_list)
     print(f"Generated {len(disputes_df)} disputes.")
     disputes_df.to_csv("database_files/disputes.csv", index=False)

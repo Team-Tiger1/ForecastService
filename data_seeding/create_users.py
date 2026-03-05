@@ -8,7 +8,10 @@ import pandas as pd
 RANDOM_SEED = 12
 random.seed(RANDOM_SEED)
 
+<<<<<<< HEAD
 # Load the necessary files
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
 with open("user_creation_data/names.txt", "r") as f:
     NAMES = [line.strip() for line in f]
 with open("user_creation_data/email_providers.txt", "r") as f:
@@ -22,7 +25,10 @@ def create_user():
 
     user_id = str(uuid.uuid4())
 
+<<<<<<< HEAD
     # Random combination of letters and numbers
+=======
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     password = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
 
     # Random name and email provider forms the users email address
@@ -40,6 +46,7 @@ def create_user():
 
 
 def create_users(num_users=250):
+<<<<<<< HEAD
     """
     Generates N users.
     :param num_users: Number of users to create.
@@ -47,6 +54,10 @@ def create_users(num_users=250):
     print("Creating Users...")
 
     # Iterates num_user times to create users
+=======
+    print("Creating Users...")
+
+>>>>>>> 2199e9c1f5f61fc99eb47626b9746022efb58fda
     users = [create_user() for _ in range(num_users)]
     users_df = pd.DataFrame(users)
 
