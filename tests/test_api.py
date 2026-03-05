@@ -56,9 +56,15 @@ def payload():
     :return: Dictionary of input data.
     """
     return {
-        "price": 11.0, "discount": 1.0, "lead_time": 5, "window_length": 5.0,
-        "weather": "Heavy Rain", "category": "DRINKS_BEVERAGES",
-        "day": "Monday", "time_of_day": 15
+        "price": 11.0,
+        "discount": 1.0,
+        "lead_time": 5,
+        "window_length": 5.0,
+        "weather": "Heavy Rain",
+        "category": "DRINKS_BEVERAGES",
+        "day": "Monday",
+        "time_of_day": 15,
+        "temperature": 15.0
     }
 
 @pytest.fixture
@@ -129,6 +135,13 @@ def test_forecast_optimisation(token, optimise_payload, mock_db_session):
     :param mock_db_session: The database session.
     """
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+
+    mock_products = [
+        {"product_id": "7bf6bc21-0959-455b-9785-69a69bbbe0c9", "retail_price": 5.0},
+        {"product_id": "b059eae9-f795-492e-9c6e-1161ca953dd2", "retail_price": 10.0}
+    ]
+
+    mock_db_session.execute.return_value.mappings.return_value.all.return_value = mock_products
 
     with patch("src.main.get_current_weather", return_value=("Cloudy", 18.0)):
         response = client.post("/forecast/optimise", json=optimise_payload, headers=headers)
