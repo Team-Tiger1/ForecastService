@@ -61,6 +61,19 @@ def payload():
         "day": "Monday", "time_of_day": 15
     }
 
+@pytest.fixture
+def optimise_payload():
+    """
+    Predetermined input data for the optimisation endpoint.
+    :return: Dictionary of input data.
+    """
+
+    return {
+        "retail_price": 15.0,
+        "category": "READY_MEALS_HOT_FOOD",
+    }
+
+
 
 def test_forecast_bundle_id(token, mock_db_session):
     """
@@ -103,3 +116,25 @@ def test_forecast_simulation(token, payload, mock_db_session):
     # Ensure the ML model output is present
     assert "reservation" in data
     assert "collection" in data
+
+def test_forecast_optimisation(token, optimise_payload, mock_db_session):
+    """
+    Tests the POST /forecast/optimise endpoint.
+    :param token: The JWT token.
+    :param optimise_payload: The predetermined payload.
+    :param mock_db_session: The database session.
+    """
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+
+    with patch("src.main.get_current_weather", return_value=("Cloudy", 18.0)):
+        response = client.post("/forecast/optimise", json=optimise_payload, headers=headers)
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Ensure the optimisation output is correct
+    assert "price" in data
+    assert "collection_start" in data
+    assert "collection_end" in data
+    assert "reservation_probability" in data
+    assert "collection_probability" in data

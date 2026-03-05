@@ -1,4 +1,8 @@
+import datetime
 import os
+
+import numpy as np
+import pandas as pd
 import requests
 import joblib
 from fastapi import HTTPException
@@ -78,12 +82,12 @@ def get_current_weather(vendor_id, db):
     try:
         # Gets the weather for the vendors location using the weather API
         api_key = os.getenv("WEATHER_API_KEY")
-        
+
         # For local deployment if no api key is provided
         if not api_key:
             # Return mock data
             return "Sunny", 20.0
-        
+
         postcode = postcode['postcode']
         url = f"https://api.weatherapi.com/v1/current.json?key={api_key}&q={postcode}"
 
@@ -97,3 +101,111 @@ def get_current_weather(vendor_id, db):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Weather API Error: {e}")
+
+
+def optimise(input_data):
+    """
+    Determines the best prices, window, etc. for a bundle to sell
+    :param input_df: Dataframe containing input data such as category, retail_price, weather, day, and time.
+    :return: The best parameters to make the bundle collection/reservation as high as possible.
+    """
+    if not model_reservation or not model_collection:
+        raise HTTPException(status_code=500, detail="Models not loaded")
+
+    # Extract data from input_data
+    retail_price = input_data['retail_price']
+    category = input_data['category']
+    weather = input_data['weather']
+    temperature = input_data['temperature']
+
+    # Calculate day and time
+    now = datetime.datetime.now().replace(second=0, microsecond=0)
+
+    # Round to the next 30 minute
+    if 0 < now.minute < 30:
+        now = now.replace(minute=30)
+    elif now.minute > 30:
+        now = now.replace(minute=0) + datetime.timedelta(hours=1)
+
+    # Current day and time
+    day = now.strftime('%A')
+    time = now.hour + (now.minute / 60.0)
+
+    # List of days and current day to be used later
+    days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    current_day_idx = days_of_week.index(day)
+
+    # Creates lists to be made into combinations
+    discounts = np.arange(0.25, 0.8, 0.05)
+    lead_times = np.arange(0.5, 8.5, 0.5)
+    window_lengths = np.arange(0.5, 8.5, 0.5)
+
+    combinations = []
+
+    for discount in discounts:
+        # Calculates the price
+        price = retail_price * (1 - discount)
+        for lead_time in lead_times:
+
+            # Checks if the lead_time will make the collection into the next day
+            total_hours_ahead = time + lead_time
+            days_to_shift = int(total_hours_ahead // 24)
+            day = days_of_week[(current_day_idx + days_to_shift) % 7]
+
+            time_of_day = int((time + lead_time) % 24)
+            for window_length in window_lengths:
+                # Combines options into individual combinations
+                combinations.append({
+                    'discount': discount,
+                    'price': price,
+                    'weather': weather,
+                    'category': category,
+                    'temperature': temperature,
+                    'day': day,
+                    'lead_time': lead_time,
+                    'window_length': window_length,
+                    'time_of_day': time_of_day
+                })
+
+    df = pd.DataFrame(combinations)
+
+    try:
+        # Tests combinations in model
+        reservation_probability = model_reservation.predict_proba(df)[:, 1]
+        collection_probability = model_collection.predict_proba(df)[:, 1]
+
+        df['reservation_probability'] = reservation_probability
+        df['collection_probability'] = collection_probability
+
+        # Works out the probability of both reservation and collection occurring
+        df['joint_probability'] = df['reservation_probability'] * df['collection_probability']
+
+        # Expected price to determine best params
+        df['expected_profit'] = df['price'] * df['joint_probability']
+
+        # Gets the best combination
+        best_index = df['expected_profit'].idxmax()
+        best_params = df.loc[best_index]
+
+        # Calculate the start and end times of the window to be returned
+        collection_start = now + datetime.timedelta(hours=best_params['lead_time'])
+        collection_end = collection_start + datetime.timedelta(hours=best_params['window_length'])
+
+        return {
+            'price' : round(best_params['price'], 2),
+            'collection_start': collection_start.strftime("%Y-%m-%d %H:%M:%S"),
+            'collection_end': collection_end.strftime("%Y-%m-%d %H:%M:%S"),
+            'reservation_probability': int(round(best_params['reservation_probability'] * 100)),
+            'collection_probability': int(round(best_params['collection_probability'] * 100)),
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Optimization Failed: {e}")
+
+
+
+
+
+
+
+

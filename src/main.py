@@ -1,3 +1,5 @@
+import datetime
+
 import pandas as pd
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -5,10 +7,11 @@ from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
-from .auth import get_current_vendor_id
-from .database import get_db
-from .schemas import SimulationRequest
-from .services import predict, get_current_weather, model_reservation, model_collection
+from auth import get_current_vendor_id
+from database import get_db
+from schemas import SimulationRequest, OptimisationRequest
+from services import predict, get_current_weather, model_reservation, model_collection, optimise
+import uvicorn
 
 # Load environment variables
 load_dotenv()
@@ -31,11 +34,34 @@ app.add_middleware(
 )
 
 
-@app.post("/forecast/simulate")
-def simulate_forecast(
-        request: SimulationRequest,
+@app.get("/forecast/optimise")
+def optimise_bundle(
+        request: OptimisationRequest,
         vendor_id: str = Depends(get_current_vendor_id),
         db: Session = Depends(get_db)
+):
+    """
+    Optimise the bundle to help make it sell
+    :param request: The retail_price and category of the bundle.
+    :return: A dictionary containing the forecast result for both reservation and collection.
+    """
+
+    # Get current weather
+    weather, temperature = get_current_weather(vendor_id, db)
+
+    input_data = {
+        'retail_price': request.retail_price,
+        'category': request.category,
+        'weather' : weather,
+        'temperature': temperature,
+    }
+
+    return optimise(input_data)
+
+
+@app.get("/forecast/simulate")
+def simulate_forecast(
+        request: SimulationRequest
 ):
     """
     Simulate a forecast based on fake data inputted by the user.
@@ -45,14 +71,12 @@ def simulate_forecast(
     :return: A dictionary containing the forecast result for both reservation and collection.
     """
 
-    weather, temperature = get_current_weather(vendor_id, db)
-
     input_data = {
         'discount': request.discount,
         'price': request.price,
-        'weather': weather,
+        'weather': request.weather,
         'category': request.category,
-        'temperature': temperature,
+        'temperature': request.temperature,
         'day': request.day,
         'lead_time': max(0.0, request.lead_time),
         'window_length': max(1.0, request.window_length),
@@ -137,3 +161,8 @@ def health_check():
     Simple health check endpoint.
     """
     return {"status": "ok", "message": "Forecast Service is running"}
+
+
+if __name__ == "__main__":
+    # Runs the dev server directly from the script
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
