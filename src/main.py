@@ -7,10 +7,10 @@ from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
-from src.auth import get_current_vendor_id
-from src.database import get_db
-from src.schemas import SimulationRequest, OptimisationRequest
-from src.services import predict, get_current_weather, model_reservation, model_collection, optimise
+from auth import get_current_vendor_id
+from database import get_db
+from schemas import SimulationRequest, OptimisationRequest
+from services import predict, get_current_weather, model_reservation, model_collection, optimise
 import uvicorn
 
 # Load environment variables
@@ -34,7 +34,7 @@ app.add_middleware(
 )
 
 
-@app.get("/forecast/optimise")
+@app.post("/forecast/optimise")
 def optimise_bundle(
         request: OptimisationRequest,
         vendor_id: str = Depends(get_current_vendor_id),
@@ -59,7 +59,7 @@ def optimise_bundle(
     return optimise(input_data, db)
 
 
-@app.get("/forecast/simulate")
+@app.post("/forecast/simulate")
 def simulate_forecast(
         request: SimulationRequest
 ):
