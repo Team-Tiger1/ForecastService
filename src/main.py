@@ -50,13 +50,13 @@ def optimise_bundle(
     weather, temperature = get_current_weather(vendor_id, db)
 
     input_data = {
-        'retail_price': request.retail_price,
+        'product_id_list': request.product_id_list,
         'category': request.category,
         'weather' : weather,
         'temperature': temperature,
     }
 
-    return optimise(input_data)
+    return optimise(input_data, db)
 
 
 @app.get("/forecast/simulate")

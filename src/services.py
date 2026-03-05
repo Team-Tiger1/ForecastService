@@ -103,20 +103,48 @@ def get_current_weather(vendor_id, db):
         raise HTTPException(status_code=500, detail=f"Weather API Error: {e}")
 
 
-def optimise(input_data):
+def optimise(input_data, db):
     """
     Determines the best prices, window, etc. for a bundle to sell
     :param input_df: Dataframe containing input data such as category, retail_price, weather, day, and time.
+    :param db: Database session.
     :return: The best parameters to make the bundle collection/reservation as high as possible.
     """
     if not model_reservation or not model_collection:
         raise HTTPException(status_code=500, detail="Models not loaded")
 
     # Extract data from input_data
-    retail_price = input_data['retail_price']
+    product_id_list = input_data['product_list']
     category = input_data['category']
     weather = input_data['weather']
     temperature = input_data['temperature']
+
+    try:
+        # Get all unique product ids
+        unique_product_ids = list(set(product_id_list))
+
+        # Query database to get prices for each unique product
+        query = text("SELECT product_id, price FROM products WHERE product_id IN :ids")
+        result = db.execute(query, {'ids': tuple(unique_product_ids)}).mappings().all()
+
+        # Create map of product id to price
+        product_price_map = {}
+        for row in result:
+            id = str(row['product_id'])
+            price = float(row['price'])
+            product_price_map[id] = price
+
+        # Calculate total price using map of product id to price
+        retail_price = 0.0
+        for product_id in product_id_list:
+            retail_price += product_price_map[product_id]
+
+        # If there is no products raise an error
+        if retail_price == 0:
+            raise HTTPException(status_code=404, detail="No valid products found to calculate price")
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error calculating price: {e}")
 
     # Calculate day and time
     now = datetime.datetime.now().replace(second=0, microsecond=0)
@@ -192,7 +220,7 @@ def optimise(input_data):
         collection_end = collection_start + datetime.timedelta(hours=best_params['window_length'])
 
         return {
-            'price' : round(best_params['price'], 2),
+            'price': round(best_params['price'], 2),
             'collection_start': collection_start.strftime("%Y-%m-%d %H:%M:%S"),
             'collection_end': collection_end.strftime("%Y-%m-%d %H:%M:%S"),
             'reservation_probability': int(round(best_params['reservation_probability'] * 100)),
@@ -201,11 +229,3 @@ def optimise(input_data):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Optimization Failed: {e}")
-
-
-
-
-
-
-
-
