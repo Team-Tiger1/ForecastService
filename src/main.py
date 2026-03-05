@@ -163,6 +163,6 @@ def health_check():
     return {"status": "ok", "message": "Forecast Service is running"}
 
 
-if __name__ == "__main__":
-    # Runs the dev server directly from the script
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+# if __name__ == "__main__":
+#     # Runs the dev server directly from the script
+#     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

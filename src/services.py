@@ -114,7 +114,7 @@ def optimise(input_data, db):
         raise HTTPException(status_code=500, detail="Models not loaded")
 
     # Extract data from input_data
-    product_id_list = input_data['product_list']
+    product_id_list = input_data['product_id_list']
     category = input_data['category']
     weather = input_data['weather']
     temperature = input_data['temperature']
@@ -124,14 +124,14 @@ def optimise(input_data, db):
         unique_product_ids = list(set(product_id_list))
 
         # Query database to get prices for each unique product
-        query = text("SELECT product_id, price FROM products WHERE product_id IN :ids")
+        query = text("SELECT product_id, retail_price FROM products WHERE product_id IN :ids")
         result = db.execute(query, {'ids': tuple(unique_product_ids)}).mappings().all()
 
         # Create map of product id to price
         product_price_map = {}
         for row in result:
             id = str(row['product_id'])
-            price = float(row['price'])
+            price = float(row['retail_price'])
             product_price_map[id] = price
 
         # Calculate total price using map of product id to price
