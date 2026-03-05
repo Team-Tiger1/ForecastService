@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import List
 
 class SimulationRequest(BaseModel):
     """
@@ -18,5 +19,5 @@ class OptimisationRequest(BaseModel):
     """
     Defines the input structure for the optimisation request.
     """
-    retail_price: float
+    product_id_list: List[str]
     category: str

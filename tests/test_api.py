@@ -69,8 +69,12 @@ def optimise_payload():
     """
 
     return {
-        "retail_price": 15.0,
-        "category": "READY_MEALS_HOT_FOOD",
+        "product_id_list": [
+            "7bf6bc21-0959-455b-9785-69a69bbbe0c9",
+            "7bf6bc21-0959-455b-9785-69a69bbbe0c9",
+            "b059eae9-f795-492e-9c6e-1161ca953dd2"
+        ],
+        "category": "READY_MEALS_HOT_FOOD"
     }
 
 
