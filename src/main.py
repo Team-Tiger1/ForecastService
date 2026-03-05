@@ -7,10 +7,10 @@ from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
-from auth import get_current_vendor_id
-from database import get_db
-from schemas import SimulationRequest, OptimisationRequest
-from services import predict, get_current_weather, model_reservation, model_collection, optimise
+from src.auth import get_current_vendor_id
+from src.database import get_db
+from src.schemas import SimulationRequest, OptimisationRequest
+from src.services import predict, get_current_weather, model_reservation, model_collection, optimise
 import uvicorn
 
 # Load environment variables
@@ -50,13 +50,13 @@ def optimise_bundle(
     weather, temperature = get_current_weather(vendor_id, db)
 
     input_data = {
-        'retail_price': request.retail_price,
+        'product_id_list': request.product_id_list,
         'category': request.category,
         'weather' : weather,
         'temperature': temperature,
     }
 
-    return optimise(input_data)
+    return optimise(input_data, db)
 
 
 @app.get("/forecast/simulate")
@@ -163,6 +163,6 @@ def health_check():
     return {"status": "ok", "message": "Forecast Service is running"}
 
 
-if __name__ == "__main__":
-    # Runs the dev server directly from the script
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+# if __name__ == "__main__":
+#     # Runs the dev server directly from the script
+#     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
