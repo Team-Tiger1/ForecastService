@@ -118,6 +118,7 @@ def optimise(input_data, db):
     category = input_data['category']
     weather = input_data['weather']
     temperature = input_data['temperature']
+    vendor_id = input_data['vendor_id']
 
     try:
         # Get all unique product ids
@@ -192,7 +193,8 @@ def optimise(input_data, db):
                     'day': day,
                     'lead_time': lead_time,
                     'window_length': window_length,
-                    'time_of_day': time_of_day
+                    'time_of_day': time_of_day,
+                    'vendor_id': vendor_id
                 })
 
     df = pd.DataFrame(combinations)

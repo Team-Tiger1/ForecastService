@@ -10,7 +10,7 @@ from sklearn.pipeline import Pipeline
 df = pd.read_csv("dataset.csv")
 
 # Split the columns into 3 categories based on the data within them
-categorical_columns = ['weather', 'category', 'day']
+categorical_columns = ['weather', 'category', 'day', 'vendor_id']
 skewed_columns = ['lead_time', 'window_length']
 numerical_columns = ['price', 'temperature', 'time_of_day']
 
