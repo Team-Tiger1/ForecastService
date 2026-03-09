@@ -231,8 +231,6 @@ def optimise(input_data, db):
                 return "half an hour"
             elif hours == 1 and not has_half_hour:
                 return "1 hour"
-            elif hours == 1 and has_half_hour:
-                return "1 and a half hours"
             elif has_half_hour:
                 return f"{hours} and a half hours"
             else:
@@ -242,12 +240,8 @@ def optimise(input_data, db):
         window_length = round(best_params['window_length'] * 2) / 2
 
         window_length_phrase = create_time_phrase(window_length)
-
-        if lead_time == 0:
-            time_text = f"immediately with a window length of {window_length_phrase}"
-        else:
-            lead_time_phrase = create_time_phrase(lead_time)
-            time_text = f"in {lead_time_phrase} with a window length of {window_length_phrase}"
+        lead_time_phrase = create_time_phrase(lead_time)
+        time_text = f"in {lead_time_phrase} with a window length of {window_length_phrase}"
 
         explanation = (
             f"A discount of {discount}% maximises your profit while maintaining a high chance of reservation and collection."
