@@ -11,7 +11,7 @@ RANDOM_SEED = 12
 random.seed(RANDOM_SEED)
 
 # Load needed datasets
-WEATHER = pd.read_csv('weather_files/weather_data_exeter.csv.csv')
+WEATHER = pd.read_csv('weather_files/weather_data_exeter.csv')
 BUNDLES = pd.read_csv('database_files/bundles.csv')
 USERS = pd.read_csv('database_files/users.csv')
 NORMALISED_CATEGORIES = pd.read_csv('normalisation_files/categories.csv')
@@ -166,7 +166,7 @@ def calculate_decision(bundle, weights, threshold, create_dataset_entry=False):
     return score > threshold
 
 
-def simulate_reservation(bundle, user_id):
+def simulate_reservation(bundle, user_id, vendor_id):
     """
     Simulates whether a given bundle will be reserved and then if it will be collected.
     :param bundle: The bundle.
@@ -215,6 +215,9 @@ def simulate_reservation(bundle, user_id):
         # If the bundle is not reserved the function returns early and does not return an entry for the reservation dataset
         dataset_entry['is_collected'] = False
         return None, dataset_entry
+
+    # Adds the vendor_id to the dataset
+    dataset_entry['vendor_id'] = vendor_id
 
     # If the collection decision is true the status is set to COLLECTED to match the enum used in the database
     if is_collected:
@@ -265,7 +268,8 @@ def generate_reservations():
     # Iterates through each bundle
     for _, bundle in BUNDLES.iterrows():
         user_id = random.choice(users_list)['user_id']
-        reservation, dataset_entry = simulate_reservation(bundle, user_id)
+        vendor_id = bundle['vendor_id']
+        reservation, dataset_entry = simulate_reservation(bundle, user_id, vendor_id)
 
         dataset.append(dataset_entry)
 
@@ -277,7 +281,7 @@ def generate_reservations():
     dataset_df = pd.DataFrame(dataset)
     current_dir = Path(__file__).resolve().parent
     target_dir = current_dir.parent / 'src' / 'ml'
-    file_path = target_dir / 'ml.csv'
+    file_path = target_dir / 'dataset.csv'
     dataset_df.to_csv(file_path, index=False)
 
     reservations_df = pd.DataFrame(reservations)

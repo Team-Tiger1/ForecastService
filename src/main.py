@@ -54,6 +54,7 @@ def optimise_bundle(
         'category': request.category,
         'weather' : weather,
         'temperature': temperature,
+        'vendor_id': vendor_id
     }
 
     return optimise(input_data, db)
@@ -61,13 +62,13 @@ def optimise_bundle(
 
 @app.post("/forecast/simulate")
 def simulate_forecast(
-        request: SimulationRequest
+        request: SimulationRequest,
+        vendor_id: str = Depends(get_current_vendor_id)
 ):
     """
     Simulate a forecast based on fake data inputted by the user.
     :param request: The fake bundle parameters.
     :param vendor_id: The id of the vendor.
-    :param db: Database session.
     :return: A dictionary containing the forecast result for both reservation and collection.
     """
 
@@ -80,7 +81,8 @@ def simulate_forecast(
         'day': request.day,
         'lead_time': max(0.0, request.lead_time),
         'window_length': max(1.0, request.window_length),
-        'time_of_day': request.time_of_day
+        'time_of_day': request.time_of_day,
+        'vendor_id': vendor_id
     }
 
     input_df = pd.DataFrame([input_data])
@@ -140,7 +142,8 @@ def predict_bundle(
             'day': collection_start.strftime('%A'),
             'lead_time': (collection_start - posting_time).total_seconds() / 3600,
             'window_length': (collection_end - collection_start).total_seconds() / 3600,
-            'time_of_day': collection_start.hour
+            'time_of_day': collection_start.hour,
+            'vendor_id': vendor_id
         }
 
         # The input data dictionary is converted into a dataframe and passed to the predict helper function
