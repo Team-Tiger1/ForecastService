@@ -221,12 +221,40 @@ def optimise(input_data, db):
         collection_start = now + datetime.timedelta(hours=best_params['lead_time'])
         collection_end = collection_start + datetime.timedelta(hours=best_params['window_length'])
 
+        discount = int(best_params['discount'] * 100)
+
+        def create_time_phrase(total_hours):
+            hours = int(total_hours)
+            has_half_hour = (total_hours - hours) > 0
+
+            if hours == 0 and has_half_hour:
+                return "half an hour"
+            elif hours == 1 and not has_half_hour:
+                return "1 hour"
+            elif has_half_hour:
+                return f"{hours} and a half hours"
+            else:
+                return f"{hours} hours"
+
+        lead_time = round(best_params['lead_time'] * 2) / 2
+        window_length = round(best_params['window_length'] * 2) / 2
+
+        window_length_phrase = create_time_phrase(window_length)
+        lead_time_phrase = create_time_phrase(lead_time)
+        time_text = f"in {lead_time_phrase} with a window length of {window_length_phrase}"
+
+        explanation = (
+            f"A discount of {discount}% maximises your profit while maintaining a high chance of reservation and collection."
+            f"Posting the bundle {time_text} will also increase the chances of this bundle being reserved and collected."
+        )
+
         return {
             'price': round(best_params['price'], 2),
             'collection_start': collection_start.strftime("%Y-%m-%d %H:%M:%S"),
             'collection_end': collection_end.strftime("%Y-%m-%d %H:%M:%S"),
             'reservation_probability': int(round(best_params['reservation_probability'] * 100)),
             'collection_probability': int(round(best_params['collection_probability'] * 100)),
+            'explanation': explanation
         }
 
     except Exception as e:
