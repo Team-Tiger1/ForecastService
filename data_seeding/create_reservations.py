@@ -193,6 +193,9 @@ def simulate_reservation(bundle, user_id, vendor_id):
     is_reserved, dataset_entry = calculate_decision(bundle, reservation_weights, threshold, True)
     dataset_entry['is_reserved'] = is_reserved
 
+    # Adds the vendor_id to the dataset
+    dataset_entry['vendor_id'] = vendor_id
+
     # The weights for the collection decision. The weather conditions and temperature are the two main decision factors.
     collection_weights = {
         'weather': 0.3,
@@ -216,9 +219,6 @@ def simulate_reservation(bundle, user_id, vendor_id):
         dataset_entry['is_collected'] = False
         return None, dataset_entry
 
-    # Adds the vendor_id to the dataset
-    dataset_entry['vendor_id'] = vendor_id
-
     # If the collection decision is true the status is set to COLLECTED to match the enum used in the database
     if is_collected:
         status = 'COLLECTED'
@@ -237,8 +237,11 @@ def simulate_reservation(bundle, user_id, vendor_id):
     reservation_time = datetime.fromtimestamp(reservation_time_unix).isoformat()
 
     # A random collection time is chosen between the collection start time or reservation time and collection end time
-    collection_time_unix = random.uniform(max(reservation_time_unix, collection_start_timestamp), collection_end_timestamp)
-    collection_time = datetime.fromtimestamp(collection_time_unix).isoformat()
+    if is_collected:
+        collection_time_unix = random.uniform(max(reservation_time_unix, collection_start_timestamp), collection_end_timestamp)
+        collection_time = datetime.fromtimestamp(collection_time_unix).isoformat()
+    else:
+        collection_time = None
 
     reservation = {
         'reservation_id': reservation_id,
