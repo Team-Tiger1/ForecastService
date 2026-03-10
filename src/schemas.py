@@ -13,7 +13,7 @@ class SimulationRequest(BaseModel):
     temperature: float
     category: str
     day: str
-    time_of_day: int
+    time_of_day: float
 
 class OptimisationRequest(BaseModel):
     """
