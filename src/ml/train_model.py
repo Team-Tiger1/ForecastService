@@ -1,8 +1,9 @@
 import joblib
 import numpy as np
 import pandas as pd
+from imblearn.over_sampling import SMOTE
 from sklearn.compose import ColumnTransformer
-from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, FunctionTransformer
 from sklearn.pipeline import Pipeline
 
@@ -37,31 +38,42 @@ preprocessor = ColumnTransformer(transformers=[
     ('numerical', numerical_pipeline, numerical_columns)
 ], remainder='drop')
 
-def create_model_pipeline():
+X = df.drop(['is_collected', 'is_reserved'], axis=1)
+X_processed = preprocessor.fit_transform(X)
+smote = SMOTE(random_state=42)
+
+def create_model_pipeline(X_balanced, y_balanced):
     """
     Creates an ML pipeline combining preprocessing with the classifier.
-    :return: A scikit-learn Pipeline object that can be used by the forecast service endpoint to predict reservation and collection outcomes.
+    :param X_balanced: Balanced input variables X.
+    :param y_balanced: Balanced target variable y.
+    :return: Pipeline object.
     """
 
-    return Pipeline([
+    classifier = RandomForestClassifier(
+        max_depth=None,
+        max_features='log2',
+        min_samples_split=2,
+        n_estimators=300,
+        random_state=42
+    )
+    classifier.fit(X_balanced, y_balanced)
+
+    pipeline = Pipeline([
         ('preprocessor', preprocessor),
-        ('classifier', GradientBoostingClassifier(n_estimators=300, learning_rate=0.05, max_depth=4, random_state=42))
+        ('classifier', classifier)
     ])
 
-# Removes the targets from the input features
-X = df.drop(['is_collected', 'is_reserved'], axis=1)
+    return pipeline
 
-# Target variables
-y_reserved = df['is_reserved']
-y_collected = df['is_collected']
+# Balances the dataset
+X_reservation_balanced, y_reservation_balanced = smote.fit_resample(X_processed, df['is_reserved'])
+X_collection_balanced, y_collection_balanced = smote.fit_resample(X_processed, df['is_collected'])
 
-pipeline_reservation = create_model_pipeline()
-pipeline_reservation.fit(X, y_reserved)
+# Create and train the models
+pipeline_reservation = create_model_pipeline(X_reservation_balanced, y_reservation_balanced)
+pipeline_collection = create_model_pipeline(X_collection_balanced, y_collection_balanced)
 
-pipeline_collection = create_model_pipeline()
-pipeline_collection.fit(X, y_collected)
-
-# Saves the entire ML pipeline to a single file
+# Saves the models to .pkl files
 joblib.dump(pipeline_reservation, 'pipeline_reservation.pkl')
 joblib.dump(pipeline_collection, 'pipeline_collection.pkl')
-print("Pipelines saved as 'pipeline_reservation.pkl' and 'pipeline_collection.pkl'")
