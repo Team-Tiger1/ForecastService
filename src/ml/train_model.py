@@ -75,5 +75,5 @@ pipeline_reservation = create_model_pipeline(X_reservation_balanced, y_reservati
 pipeline_collection = create_model_pipeline(X_collection_balanced, y_collection_balanced)
 
 # Saves the models to .pkl files
-joblib.dump(pipeline_reservation, 'pipeline_reservation.pkl')
-joblib.dump(pipeline_collection, 'pipeline_collection.pkl')
+joblib.dump(pipeline_reservation, 'pipeline_reservation.pkl', compress=3)
+joblib.dump(pipeline_collection, 'pipeline_collection.pkl', compress=3)
