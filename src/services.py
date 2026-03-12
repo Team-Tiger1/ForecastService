@@ -48,11 +48,9 @@ def predict(input_df):
 
         return {
             'reservation': {
-                'reservation_prediction': reservation_prediction,
                 'reservation_probability': round(reservation_probability * 100),
             },
             'collection': {
-                'collection_prediction': collection_prediction,
                 'collection_probability': round(collection_probability * 100),
             }
         }
