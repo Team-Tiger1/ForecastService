@@ -242,7 +242,7 @@ def optimise(input_data, db):
         time_text = f"in {lead_time_phrase} with a window length of {window_length_phrase}"
 
         explanation = (
-            f"A discount of {discount}% maximises your profit while maintaining a high chance of reservation and collection."
+            f"A discount of {discount}% maximises your profit while maintaining a high chance of reservation and collection. "
             f"Posting the bundle {time_text} will also increase the chances of this bundle being reserved and collected."
         )
 
