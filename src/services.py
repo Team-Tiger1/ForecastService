@@ -245,9 +245,13 @@ def optimise(input_data, db):
         lead_time_phrase = create_time_phrase(lead_time)
         time_text = f"in {lead_time_phrase} with a window length of {window_length_phrase}"
 
+        optimised_reservation_probability = int(round(best_params['reservation_probability'] * 100))
+        optimised_collection_probability = int(round(best_params['collection_probability'] * 100))
+
         explanation = (
             f"A discount of {discount}% maximises your profit while maintaining a high chance of reservation and collection. "
-            f"Posting the bundle {time_text} will also increase the chances of this bundle being reserved and collected."
+            f"Posting the bundle {time_text} will also increase the chances of this bundle being reserved and collected. "
+            f"This configuration results in a {optimised_reservation_probability}% chance of a reservation and a {optimised_collection_probability}% chance of a successful collection."
         )
 
         return {
