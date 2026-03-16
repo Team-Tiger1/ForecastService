@@ -32,7 +32,7 @@ def evaluate_model(pipeline, X_test, y_test, model_name):
     plt.show()
 
 
-if __name__ == "__main__":
+def evaluate_models():
     print("Loading data")
     df = pd.read_csv('dataset.csv')
 
@@ -80,3 +80,7 @@ if __name__ == "__main__":
     print("Running evaluations")
     evaluate_model(pipeline_reservation, X_test, y_reservation_test, "Reservation")
     evaluate_model(pipeline_collection, X_test, y_collection_test, "Collection")
+
+
+# if __name__ == "__main__":
+#     evaluate_models()

@@ -54,7 +54,7 @@ def create_model_pipeline(preprocessor, X, y):
     return pipeline
 
 
-if __name__ == "__main__":
+def train_models():
     print("Loading data")
     df = pd.read_csv('dataset.csv')
 
@@ -104,3 +104,7 @@ if __name__ == "__main__":
     joblib.dump(pipeline_collection, 'pipeline_collection.pkl', compress=3)
 
     print("Models trained and saved")
+
+
+# if __name__ == "__main__":
+#     train_models()
