@@ -2,30 +2,12 @@ import joblib
 import numpy as np
 import pandas as pd
 from imblearn.over_sampling import SMOTE
-from sentence_transformers import SentenceTransformer
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, FunctionTransformer
 from sklearn.pipeline import Pipeline
 
-embed_model = None
-
-
-def embed_weather(X):
-    """
-    Converts a column of weather data to numeric vectors.
-    :param X: Column of weather data.
-    :return: Converted numeric vectors.
-    """
-    global embed_model
-
-    # Only load the model once
-    if embed_model is None:
-        embed_model = SentenceTransformer('all-MiniLM-L6-v2')
-
-    # Flatten input and convert to a list of strings
-    weather_texts = np.ravel(X).tolist()
-    return embed_model.encode(weather_texts)
+from src.ml.utils import embed_weather
 
 
 def create_model_pipeline(preprocessor, X, y):

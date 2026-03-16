@@ -8,7 +8,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, FunctionTransformer
 from sklearn.pipeline import Pipeline
 
-from src.ml.train_model import embed_weather, create_model_pipeline
+from src.ml.train_model import create_model_pipeline
+from src.ml.utils import embed_weather
 
 
 def evaluate_model(pipeline, X_test, y_test, model_name):
