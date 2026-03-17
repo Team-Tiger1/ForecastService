@@ -1,9 +1,10 @@
 import joblib
 import numpy as np
 import pandas as pd
+from sklearn.linear_model import LogisticRegression
 from imblearn.over_sampling import SMOTE
 from sklearn.compose import ColumnTransformer
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, FunctionTransformer
 from sklearn.pipeline import Pipeline
 
@@ -12,13 +13,14 @@ from src.ml.utils import embed_weather
 
 def create_model_pipeline(preprocessor, X, y):
     """
-    Creates pipeline by combining preprocessing with the trained classifier.
+    Creates pipeline by combining preprocessing with a voting classifier.
     :param preprocessor: Preprocessor object.
     :param X: Input variables.
     :param y: The target variable.
     :return: The pipeline object.
     """
-    classifier = RandomForestClassifier(
+    # Random forest classifier
+    rf_classifier = RandomForestClassifier(
         max_depth=None,
         max_features='log2',
         min_samples_split=2,
@@ -26,11 +28,30 @@ def create_model_pipeline(preprocessor, X, y):
         random_state=42
     )
 
-    classifier.fit(X, y)
+    # Logistic regression classifier
+    lr_classifier = LogisticRegression(
+        max_iter=1000,
+        random_state=42,
+        C=0.1
+    )
 
+    # Combine both classifiers together into one voting classifier
+    voting_classifier = VotingClassifier(
+        estimators=[
+            ('rf_classifier', rf_classifier),
+            ('lr_classifier', lr_classifier),
+        ],
+        voting='soft',
+        weights=[5, 1]
+    )
+
+    # Train the voting classifier on the training data
+    voting_classifier.fit(X, y)
+
+    # Combine the preprocessing and the classifier into one pipeline
     pipeline = Pipeline([
         ('preprocessor', preprocessor),
-        ('classifier', classifier)
+        ('classifier', voting_classifier)
     ])
 
     return pipeline
@@ -87,6 +108,5 @@ def train_models():
 
     print("Models trained and saved")
 
-
-# if __name__ == "__main__":
-#     train_models()
+if __name__ == "__main__":
+    train_models()
