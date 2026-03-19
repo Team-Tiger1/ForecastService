@@ -50,7 +50,7 @@ def optimise_bundle(
     input_data = {
         'product_id_list': request.product_id_list,
         'category': request.category,
-        'weather' : weather,
+        'weather': weather,
         'temperature': temperature,
         'vendor_id': vendor_id
     }
@@ -70,27 +70,27 @@ def simulate_forecast(
     :return: A dictionary containing the forecast result for both reservation and collection.
     """
 
-    #Input validation
-    if(request.price<0 or request.price>999.99):
+    # Input validation
+    if request.price < 0 or request.price > 999.99:
         raise HTTPException(status_code=400)
 
-    if(request.discount<0 or request.discount >= 101):
+    if request.discount < 0 or request.discount >= 101:
         raise HTTPException(status_code=400)
 
-    Acceptable_Weather = ["Heavy rain at times","Light rain","Overcast","Partly cloudy","Sunny"]
-    if(not(request.weather in Acceptable_Weather)):
+    acceptable_weather = ["Heavy rain at times", "Light rain", "Overcast", "Partly cloudy", "Sunny"]
+    if not (request.weather in acceptable_weather):
         raise HTTPException(status_code=400)
 
-    if(request.temperature<-15 or request.temperature>40):
+    if request.temperature < -15 or request.temperature > 40:
         raise HTTPException(status_code=400)
-    Acceptable_Days_Of_Week = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
-    if(not(request.day in Acceptable_Days_Of_Week)):
-        raise HTTPException(status_code=400)
-
-    if(request.time_of_day<0 or request.time_of_day>24):
+    acceptable_days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    if not (request.day in acceptable_days_of_week):
         raise HTTPException(status_code=400)
 
-    if(request.window_length<0 or request.window_length>9):
+    if request.time_of_day < 0 or request.time_of_day > 24:
+        raise HTTPException(status_code=400)
+
+    if request.window_length < 0 or request.window_length > 9:
         raise HTTPException(status_code=400)
 
     input_data = {
@@ -106,7 +106,7 @@ def simulate_forecast(
         'vendor_id': vendor_id
     }
 
-    if(input_data["lead_time"]>8):
+    if (input_data["lead_time"] > 8):
         raise HTTPException(status_code=400)
 
     input_df = pd.DataFrame([input_data])
@@ -188,7 +188,6 @@ def health_check():
     Simple health check endpoint.
     """
     return {"status": "ok", "message": "Forecast Service is running"}
-
 
 # if __name__ == "__main__":
 #     # Runs the dev server directly from the script

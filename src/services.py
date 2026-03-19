@@ -108,7 +108,7 @@ def get_current_weather(vendor_id, db):
 def optimise(input_data, db):
     """
     Determines the best prices, window, etc. for a bundle to sell
-    :param input_df: Dataframe containing input data such as category, retail_price, weather, day, and time.
+    :param input_data: Dataframe containing input data such as category, retail_price, weather, day, and time.
     :param db: Database session.
     :return: The best parameters to make the bundle collection/reservation as high as possible.
     """
@@ -146,7 +146,7 @@ def optimise(input_data, db):
         if retail_price == 0:
             raise HTTPException(status_code=404)
 
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500)
 
     # Calculate day and time
@@ -158,13 +158,20 @@ def optimise(input_data, db):
     elif now.minute > 30:
         now = now.replace(minute=0) + datetime.timedelta(hours=1)
 
-    # Current day and time
-    day = now.strftime('%A')
+    # Current time
     time = now.hour + (now.minute / 60.0)
 
-    # List of days and current day to be used later
-    days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-    current_day_idx = days_of_week.index(day)
+    # Check the current time is not after 10 or before 6 and get the day
+    if time > 22 or time < 6:
+        if time > 22:
+            now = (now + datetime.timedelta(days=1)).replace(hour=6, minute=0)
+        else:
+            now = now.replace(hour=6, minute=0)
+
+        time = 6
+        day = now.strftime('%A')
+    else:
+        day = now.strftime('%A')
 
     # Creates lists to be made into combinations
     discounts = np.arange(0.25, 0.8, 0.05)
@@ -175,16 +182,24 @@ def optimise(input_data, db):
 
     for discount in discounts:
         # Calculates the price
-        price = retail_price * (1 - discount)
+        price = 25 * (1 - discount)
+
         for lead_time in lead_times:
+            time_of_day = time + lead_time
+            lead_time_output = lead_time
 
-            # Checks if the lead_time will make the collection into the next day
-            total_hours_ahead = time + lead_time
-            days_to_shift = int(total_hours_ahead // 24)
-            day = days_of_week[(current_day_idx + days_to_shift) % 7]
+            # Check the lead_time doesn't push the posting to the next day
+            if time_of_day > 22:
+                overflow = time_of_day - 22.5
+                time_of_day = 6 + overflow
+                day = (now + datetime.timedelta(days=1)).strftime('%A')
+                lead_time_output += 8
 
-            time_of_day = int((time + lead_time) % 24)
             for window_length in window_lengths:
+                end_time = time_of_day + window_length
+                if end_time > 22:
+                    break
+
                 # Combines options into individual combinations
                 combinations.append({
                     'discount': discount,
@@ -196,15 +211,18 @@ def optimise(input_data, db):
                     'lead_time': lead_time,
                     'window_length': window_length,
                     'time_of_day': time_of_day,
-                    'vendor_id': vendor_id
+                    'vendor_id': vendor_id,
+                    'lead_time_output': lead_time_output
                 })
 
     df = pd.DataFrame(combinations)
 
     try:
+        model_input_df = df.drop(columns=['lead_time_output'])
+
         # Tests combinations in model
-        reservation_probability = model_reservation.predict_proba(df)[:, 1]
-        collection_probability = model_collection.predict_proba(df)[:, 1]
+        reservation_probability = model_reservation.predict_proba(model_input_df)[:, 1]
+        collection_probability = model_collection.predict_proba(model_input_df)[:, 1]
 
         df['reservation_probability'] = reservation_probability
         df['collection_probability'] = collection_probability
@@ -220,7 +238,7 @@ def optimise(input_data, db):
         best_params = df.loc[best_index]
 
         # Calculate the start and end times of the window to be returned
-        collection_start = now + datetime.timedelta(hours=best_params['lead_time'])
+        collection_start = now + datetime.timedelta(hours=best_params['lead_time_output'])
         collection_end = collection_start + datetime.timedelta(hours=best_params['window_length'])
 
         discount = int(best_params['discount'] * 100)
@@ -238,7 +256,7 @@ def optimise(input_data, db):
             else:
                 return f"{hours} hours"
 
-        lead_time = round(best_params['lead_time'] * 2) / 2
+        lead_time = round(best_params['lead_time_output'] * 2) / 2
         window_length = round(best_params['window_length'] * 2) / 2
 
         window_length_phrase = create_time_phrase(window_length)
@@ -263,5 +281,5 @@ def optimise(input_data, db):
             'explanation': explanation
         }
 
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500)
