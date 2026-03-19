@@ -117,7 +117,7 @@ def test_forecast_simulation(token, payload, mock_db_session):
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
 
     # Patch 'get_current_weather' to set the weather rather use the API.
-    with patch("src.main.get_current_weather", return_value=("Rain", 15.0)):
+    with patch("src.main.get_current_weather", return_value=("Light Rain", 15.0)):
         response = client.post("/forecast/simulate", json=payload, headers=headers)
 
     assert response.status_code == 200
