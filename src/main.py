@@ -77,13 +77,14 @@ def simulate_forecast(
     if(request.discount<0 or request.discount>100):
         raise HTTPException(status_code=400)
 
-    if(not(request.weather=="Heavy rain at times" or request.weather=="Light rain" or request.weather=="Overcast" or request.weather=="Partly cloudy" or request.weather=="Sunny")):
+    Acceptable_Weather = ["Heavy rain at times","Light rain","Overcast","Partly cloudy","Sunny"]
+    if(not(request.weather in Acceptable_Weather)):
         raise HTTPException(status_code=400)
 
     if(request.temperature<-15 or request.temperature>40):
         raise HTTPException(status_code=400)
-
-    if(not(request.day=="Monday" or request.day=="Tuesday" or request.day=="Wednesday" or request.day=="Thursday" or request.day=="Friday" or request.day=="Saturday"or request.day=="Sunday")):
+    Acceptable_Days_Of_Week = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
+    if(not(request.day in Acceptable_Days_Of_Week)):
         raise HTTPException(status_code=400)
 
     if(request.time_of_day<0 or request.time_of_day>24):
