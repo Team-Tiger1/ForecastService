@@ -57,7 +57,7 @@ def payload():
     """
     return {
         "price": 11.0,
-        "discount": 1.0,
+        "discount": 0.5,
         "lead_time": 5,
         "window_length": 5.0,
         "weather": "Heavy Rain",
