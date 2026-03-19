@@ -70,6 +70,28 @@ def simulate_forecast(
     :return: A dictionary containing the forecast result for both reservation and collection.
     """
 
+    #Input validation
+    if(request.price<=0 or request.price>999.99):
+        raise HTTPException(status_code=400)
+
+    if(request.discount<0 or request.discount>100):
+        raise HTTPException(status_code=400)
+
+    if(not(request.weather=="Heavy rain at times" or request.weather=="Light rain" or request.weather=="Overcast" or request.weather=="Partly cloudy" or request.weather=="Sunny")):
+        raise HTTPException(status_code=400)
+
+    if(request.temperature<-15 or request.temperature>40):
+        raise HTTPException(status_code=400)
+
+    if(not(request.day=="Monday" or request.day=="Tuesday" or request.day=="Wednesday" or request.day=="Thursday" or request.day=="Friday" or request.day=="Saturday"or request.day=="Sunday")):
+        raise HTTPException(status_code=400)
+
+    if(request.time_of_day<0 or request.time_of_day>24):
+        raise HTTPException(status_code=400)
+
+    if(request.window_length<0 or request.window_length>9):
+        raise HTTPException(status_code=400)
+
     input_data = {
         'discount': request.discount,
         'price': request.price,
@@ -82,6 +104,9 @@ def simulate_forecast(
         'time_of_day': request.time_of_day,
         'vendor_id': vendor_id
     }
+
+    if(input_data["lead_time"]>8):
+        raise HTTPException(status_code=400)
 
     input_df = pd.DataFrame([input_data])
     return predict(input_df)
@@ -105,17 +130,17 @@ def predict_bundle(
 
     # Raises a HTTPException if the models cannot be loaded.
     if not model_reservation or not model_collection:
-        raise HTTPException(status_code=500, detail="ML Models not found")
+        raise HTTPException(status_code=500)
 
     try:
         # Gets all data about the bundle using parameterised query
         query = text("SELECT * FROM bundles WHERE bundle_id = :bid AND vendor_id = :vid")
         bundle = db.execute(query, {'bid': bundle_id, 'vid': vendor_id}).mappings().first()
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database Error: {e}")
+        raise HTTPException(status_code=500)
 
     if not bundle:
-        raise HTTPException(status_code=404, detail="Bundle not found")
+        raise HTTPException(status_code=404)
 
     try:
         # Gets the weather conditions and temperature using a helper function
@@ -153,7 +178,7 @@ def predict_bundle(
         return result
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Prediction Failed: {e}")
+        raise HTTPException(status_code=500)
 
 
 @app.get("/forecast/actuator")

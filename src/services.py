@@ -34,7 +34,7 @@ def predict(input_df):
     :return: A nested dictionary containing boolean predictions for both reservation and collection and their corresponding confidence.
     """
     if not model_reservation or not model_collection:
-        raise HTTPException(status_code=500, detail="Models not loaded")
+        raise HTTPException(status_code=500)
 
     try:
         # Passes the input dataframe to the previously loaded models
@@ -56,7 +56,7 @@ def predict(input_df):
         }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500)
 
 
 def get_current_weather(vendor_id, db):
@@ -72,10 +72,10 @@ def get_current_weather(vendor_id, db):
         query = text("SELECT postcode FROM vendor WHERE vendor_id = :vid")
         postcode = db.execute(query, {'vid': vendor_id}).mappings().first()
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database Error: {e}")
+        raise HTTPException(status_code=500)
 
     if not postcode:
-        raise HTTPException(status_code=404, detail="Postcode not found")
+        raise HTTPException(status_code=404)
 
     try:
         # Gets the weather for the vendors location using the weather API
@@ -113,7 +113,7 @@ def optimise(input_data, db):
     :return: The best parameters to make the bundle collection/reservation as high as possible.
     """
     if not model_reservation or not model_collection:
-        raise HTTPException(status_code=500, detail="Models not loaded")
+        raise HTTPException(status_code=500)
 
     # Extract data from input_data
     product_id_list = input_data['product_id_list']
@@ -144,10 +144,10 @@ def optimise(input_data, db):
 
         # If there is no products raise an error
         if retail_price == 0:
-            raise HTTPException(status_code=404, detail="No valid products found to calculate price")
+            raise HTTPException(status_code=404)
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database error calculating price: {e}")
+        raise HTTPException(status_code=500)
 
     # Calculate day and time
     now = datetime.datetime.now().replace(second=0, microsecond=0)
@@ -264,4 +264,4 @@ def optimise(input_data, db):
         }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Optimization Failed: {e}")
+        raise HTTPException(status_code=500)
