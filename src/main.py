@@ -71,7 +71,7 @@ def simulate_forecast(
     """
 
     #Input validation
-    if(request.price<=0 or request.price>999.99):
+    if(request.price<0 or request.price>999.99):
         raise HTTPException(status_code=400)
 
     if(request.discount<0 or request.discount >= 101):
