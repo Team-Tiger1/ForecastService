@@ -60,7 +60,7 @@ def payload():
         "discount": 0.5,
         "lead_time": 5,
         "window_length": 5.0,
-        "weather": "Heavy Rain",
+        "weather": "Heavy rain at times",
         "category": "DRINKS_BEVERAGES",
         "day": "Monday",
         "time_of_day": 15,
