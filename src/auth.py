@@ -41,10 +41,7 @@ def get_current_vendor_id(token: str = Depends(oauth2_scheme)):
 
     # If the secret cannot be pulled from the environment variables raise HttpException 403
     if RAW_SECRET_KEY == "secret":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="JWT Token Not Being Pulled from environment variables"
-        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         # Decode token and verify signature
@@ -53,15 +50,11 @@ def get_current_vendor_id(token: str = Depends(oauth2_scheme)):
 
         # Check the token contains a vendor ID
         if vendor_id is None:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-                detail="Token is valid, but it has no User ID inside it."
-            )
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT)
         return vendor_id
 
     except InvalidTokenError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Auth Failed: Invalid token or signature",
             headers={"WWW-Authenticate": "Bearer"},
         )
