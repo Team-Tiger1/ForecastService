@@ -74,7 +74,7 @@ def simulate_forecast(
     if(request.price<=0 or request.price>999.99):
         raise HTTPException(status_code=400)
 
-    if(request.discount<0 or request.discount>100):
+    if(request.discount<0 or request.discount >= 101):
         raise HTTPException(status_code=400)
 
     Acceptable_Weather = ["Heavy rain at times","Light rain","Overcast","Partly cloudy","Sunny"]
