@@ -182,7 +182,7 @@ def optimise(input_data, db):
 
     for discount in discounts:
         # Calculates the price
-        price = 25 * (1 - discount)
+        price = retail_price * (1 - discount)
 
         for lead_time in lead_times:
             time_of_day = time + lead_time
