@@ -144,6 +144,8 @@ go to https://pipx.pypa.io/stable/installation/
 - Built the Forecast Service API, using FastAPI to create the /predict, /simulate, and /optimise endpoints and authorised them using JWT Auth.
 - Integrated the Weather API to fetch historical data for model training and real-time conditions for predicting reservations and collections.
 - Co-Developed unit and integration tests using pytest and FastAPI TestClient with Jed Leas.
+- Reviewed pull requests.
+- 
 
 <br>
 
@@ -156,10 +158,10 @@ go to https://pipx.pypa.io/stable/installation/
 - Added input validation to the /optimise endpoint.
 - Co-Developed unit and integration tests using pytest and FastAPI TestClient with Alex Greasley.
 - Helped with bug fixing of Auth and Forecast service.
-- **Removed all returning of Specific Errors**
-- **Added input validation to simulate endpoint**
-- **Reviwed Pull Requests**
-- **Optimized Image to ingore specific files and only have a single copy of the dependancies as that reduced image size from aproximatley 35GB to 15GB**
+- Removed all returning of Specific Errors.
+- Added input validation to simulate endpoint.
+- Reviewed Pull Requests.
+- Optimized Image to ignore specific files and only have a single copy of the dependencies as that reduced image size from approximately 35GB to 15GB.
 
 <br>
 
