@@ -58,14 +58,15 @@ def payload():
     return {
         "price": 11.0,
         "discount": 0.5,
-        "lead_time": 5,
+        "lead_time": 5.0,
         "window_length": 5.0,
         "weather": "Heavy rain at times",
         "category": "DRINKS_BEVERAGES",
         "day": "Monday",
-        "time_of_day": 15,
+        "time_of_day": 15.0,
         "temperature": 15.0
     }
+
 
 @pytest.fixture
 def optimise_payload():
@@ -82,7 +83,6 @@ def optimise_payload():
         ],
         "category": "READY_MEALS_HOT_FOOD"
     }
-
 
 
 def test_forecast_bundle_id(token, mock_db_session):
@@ -102,8 +102,14 @@ def test_forecast_bundle_id(token, mock_db_session):
     data = response.json()
 
     # Ensure the ML model output is present
+    assert "bundle_id" in data
+    assert data["bundle_id"] == BUNDLE_ID
+
     assert "reservation" in data
+    assert "reservation_probability" in data["reservation"]
+
     assert "collection" in data
+    assert "collection_probability" in data["collection"]
 
 
 def test_forecast_simulation(token, payload, mock_db_session):
@@ -116,16 +122,18 @@ def test_forecast_simulation(token, payload, mock_db_session):
 
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
 
-    # Patch 'get_current_weather' to set the weather rather use the API.
-    with patch("src.main.get_current_weather", return_value=("Light rain", 15.0)):
-        response = client.post("/forecast/simulate", json=payload, headers=headers)
+    response = client.post("/forecast/simulate", json=payload, headers=headers)
 
     assert response.status_code == 200
     data = response.json()
 
     # Ensure the ML model output is present
     assert "reservation" in data
+    assert "reservation_probability" in data["reservation"]
+
     assert "collection" in data
+    assert "collection_probability" in data["collection"]
+
 
 def test_forecast_optimisation(token, optimise_payload, mock_db_session):
     """
@@ -155,3 +163,4 @@ def test_forecast_optimisation(token, optimise_payload, mock_db_session):
     assert "collection_end" in data
     assert "reservation_probability" in data
     assert "collection_probability" in data
+    assert "explanation" in data

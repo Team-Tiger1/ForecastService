@@ -37,13 +37,9 @@ def predict(input_df):
         raise HTTPException(status_code=500)
 
     try:
-        # Passes the input dataframe to the previously loaded models
-        reservation_prediction = bool(model_reservation.predict(input_df)[0])
-
         # Returns an array [[prob_false, prob_true]] therefore get just prob_true
         reservation_probability = float(model_reservation.predict_proba(input_df)[0][1])
 
-        collection_prediction = bool(model_collection.predict(input_df)[0])
         collection_probability = float(model_collection.predict_proba(input_df)[0][1])
 
         return {
@@ -55,7 +51,7 @@ def predict(input_df):
             }
         }
 
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500)
 
 
