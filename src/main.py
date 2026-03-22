@@ -156,6 +156,9 @@ def predict_bundle(
         price = bundle['price']
 
         discount = max(0, (retail_price - price) / retail_price)
+        lead_time_adjusted = (collection_start - posting_time).total_seconds() / 3600
+        if lead_time_adjusted < 0:
+            lead_time_adjusted = 0
 
         input_data = {
             'discount': discount,
@@ -164,7 +167,7 @@ def predict_bundle(
             'category': bundle['category'],
             'temperature': temperature,
             'day': collection_start.strftime('%A'),
-            'lead_time': (collection_start - posting_time).total_seconds() / 3600,
+            'lead_time': lead_time_adjusted,
             'window_length': (collection_end - collection_start).total_seconds() / 3600,
             'time_of_day': collection_start.hour,
             'vendor_id': vendor_id
