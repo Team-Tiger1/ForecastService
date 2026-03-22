@@ -151,11 +151,15 @@ go to https://pipx.pypa.io/stable/installation/
 
 - Setting up all CI/CD workflows to handle.
     1. Automatic testing on push of main branch on the forcast service repo.
-  2. Automatic Deployment onto k3s with zero downtime on completion of automatic testing so broken code won't make it to deployment.
+  2. Automatic Deployment onto k3s on completion of automatic testing so broken code won't make it to deployment.
 - And Sorting out bug fixes and connections between each microservice's to the forecast service and set up the connection to the postgre database.
 - Added input validation to the /optimise endpoint.
 - Co-Developed unit and integration tests using pytest and FastAPI TestClient with Alex Greasley.
 - Helped with bug fixing of Auth and Forecast service.
+- **Removed all returning of Specific Errors**
+- **Added input validation to simulate endpoint**
+- **Reviwed Pull Requests**
+- **Optimized Image to ingore specific files and only have a single copy of the dependancies as that reduced image size from aproximatley 35GB to 15GB**
 
 <br>
 
