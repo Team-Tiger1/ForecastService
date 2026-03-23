@@ -9,6 +9,23 @@ from fastapi import HTTPException
 from sqlalchemy import text
 from dotenv import load_dotenv
 
+import datetime
+from sqlalchemy import text
+from fastapi import HTTPException
+
+CATEGORY_MAP = {
+    'BREAD_BAKED_GOODS': 'Bread & Baked Goods',
+    'SWEET_TREATS_DESSERTS': 'Sweet Treats & Desserts',
+    'MEAT_PROTEIN': 'Meat & Protein',
+    'FRUIT_VEGETABLES': 'Fruit & Vegetables',
+    'DAIRY_EGGS': 'Dairy & Eggs',
+    'READY_MEALS_HOT_FOOD': 'Ready Meals & Hot Food',
+    'SNACKS_SAVOURY_ITEMS': 'Snacks & Savoury Items',
+    'BREAKFAST_ITEMS': 'Breakfast Items',
+    'VEGAN_VEGETARIAN': 'Vegan & Vegetarian',
+    'DRINKS_BEVERAGES': 'Drinks & Beverages'
+}
+
 # Load environment variables
 load_dotenv()
 
@@ -276,6 +293,131 @@ def optimise(input_data, db):
             'collection_probability': int(round(best_params['collection_probability'] * 100)),
             'explanation': explanation
         }
+
+    except Exception:
+        raise HTTPException(status_code=500)
+
+
+def generate_production_recommendations(vendor_id, db):
+    """
+    Determines the most common products wasted by vendors and recommends them to reduce production on specific days.
+    :param vendor_id: ID of the vendor.
+    :param db: Database session.
+    :return: A dictionary containing a list of production recommendations.
+    """
+
+    # Number of weeks to lookback
+    num_weeks = 12
+
+    try:
+        # Find the vendors latest post
+        latest_post_date_query = text("SELECT MAX(posting_time) FROM bundles WHERE vendor_id = :vid")
+        latest_post_date = db.execute(latest_post_date_query, {'vid': vendor_id}).scalar()
+
+        if not latest_post_date:
+            return {'recommendations': []}
+
+        # Get the date num_weeks ago
+        start_date = latest_post_date - datetime.timedelta(weeks=num_weeks)
+
+        # Joins the bundles, bundle_products, and products tables to get the quantities and names of the products inside the bundles posted between start_date and latest_post_date
+        query = text("""
+                     SELECT b.category,
+                            -- Gets the day and removes all whitespace from the returned value
+                            TRIM(TO_CHAR(b.posting_time, 'day')) AS day_of_week, DATE (b.posting_time) as post_date, b.bundle_id, p.name AS product_name, bp.quantity
+                     FROM bundles b
+                         JOIN bundle_products bp
+                     ON b.bundle_id = bp.bundle_id
+                         JOIN products p ON bp.product_id = p.product_id
+                     WHERE b.vendor_id = :vid
+                       AND b.posting_time >= :start_date
+                       AND b.posting_time <= :latest_post_date
+                     """)
+
+        result = db.execute(query, {
+            'vid': vendor_id,
+            'start_date': start_date,
+            'latest_post_date': latest_post_date
+        }).mappings().all()
+
+        # Combines the result into a dict containing relevant info
+        post_data = {}
+        for row in result:
+            key = (row['category'], row['day_of_week'])
+            if key not in post_data:
+                post_data[key] = {
+                    'bundles': set(),
+                    'dates': set(),
+                    'products': {},
+                }
+
+            post_data[key]['bundles'].add(row['bundle_id'])
+            post_data[key]['dates'].add(row['post_date'])
+
+            product_name = row['product_name']
+            post_data[key]['products'][product_name] = post_data[key]['products'].get(product_name, 0) + row['quantity']
+
+        recommendations = []
+
+        # Iterates through post_data to calculate averages and generate outputs
+        for (category, day_of_week), data in post_data.items():
+            total_bundles = len(data['bundles'])
+            weeks_posted = len(data['dates'])
+
+            # Calculate the average bundles posted per week for each day
+            avg_bundles_per_day = total_bundles / num_weeks
+
+            # Determines the confidence based on the posting frequency per day per week over the time period
+            if avg_bundles_per_day > 0.1:
+                confidence_ratio = weeks_posted / num_weeks
+                if confidence_ratio >= 0.8:
+                    confidence = "High"
+                elif confidence_ratio >= 0.5:
+                    confidence = "Medium"
+                else:
+                    confidence = "Low"
+
+                # Sorts the list of products by their quantity
+                product_items = data['products'].items()
+                sorted_products = sorted(product_items, key=lambda x: x[1], reverse=True)
+
+                top_products = ""
+                recommendation_text = ""
+
+                # Formats the top 2 products wasted into strings
+                for name, total_qty in sorted_products[:2]:
+                    average_qty = round(total_qty / num_weeks)
+
+                    if average_qty > 0:
+
+                        # If the string is not empty add connecting words
+                        if top_products != "":
+                            top_products += ", "
+                            recommendation_text += " and "
+
+                        top_products += name
+                        recommendation_text += f"{name} by {average_qty} unit(s)"
+
+                if top_products == "":
+                    continue
+
+                # Makes the day_of_week and category a clean format for the frontend
+                display_category = CATEGORY_MAP.get(category)
+                display_day_of_week = day_of_week.capitalize()
+
+                # The advice dictionary for each day
+                advice = {
+                    'category': display_category,
+                    'day_of_week': display_day_of_week,
+                    'avg_bundles': round(avg_bundles_per_day, 1),
+                    'recommendation': f"We recommend that on {display_day_of_week} you should reduce your production of {recommendation_text}.",
+                    'rationale': f"Over the 3 months leading up to your most recent post, your most consistently overproduced {display_category} items on {display_day_of_week}s were {top_products}. Cutting back on these items will reduce your waste!",
+                    'confidence': confidence
+                }
+                recommendations.append(advice)
+
+        return {"recommendations": recommendations}
+
 
     except Exception:
         raise HTTPException(status_code=500)

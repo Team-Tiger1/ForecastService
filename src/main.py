@@ -8,7 +8,8 @@ from sqlalchemy import text
 from src.auth import get_current_vendor_id
 from src.database import get_db
 from src.schemas import SimulationRequest, OptimisationRequest
-from src.services import predict, get_current_weather, model_reservation, model_collection, optimise
+from src.services import predict, get_current_weather, model_reservation, model_collection, optimise, \
+    generate_production_recommendations
 import uvicorn
 
 # Load environment variables
@@ -137,7 +138,7 @@ def predict_bundle(
         # Gets all data about the bundle using parameterised query
         query = text("SELECT * FROM bundles WHERE bundle_id = :bid AND vendor_id = :vid")
         bundle = db.execute(query, {'bid': bundle_id, 'vid': vendor_id}).mappings().first()
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500)
 
     if not bundle:
@@ -156,8 +157,6 @@ def predict_bundle(
         price = bundle['price']
 
         discount = max(0, (retail_price - price) / retail_price)
-
-
 
         input_data = {
             'discount': discount,
@@ -180,8 +179,22 @@ def predict_bundle(
         # The prediction result is returned
         return result
 
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500)
+
+
+@app.get("/forecast/production-advice")
+def get_production_advice(
+        vendor_id: str = Depends(get_current_vendor_id),
+        db: Session = Depends(get_db)
+):
+    """
+    Determines the most common products wasted by vendors and recommends them to reduce production on specific days.
+    :param vendor_id: ID of the vendor.
+    :param db: Database session.
+    :return: A dictionary containing a list of production recommendations.
+    """
+    return generate_production_recommendations(vendor_id, db)
 
 
 @app.get("/forecast/actuator")
@@ -191,6 +204,7 @@ def health_check():
     """
     return {"status": "ok", "message": "Forecast Service is running"}
 
-# if __name__ == "__main__":
-#     # Runs the dev server directly from the script
-#     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+
+if __name__ == "__main__":
+    # Runs the dev server directly from the script
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
