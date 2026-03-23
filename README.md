@@ -145,7 +145,6 @@ go to https://pipx.pypa.io/stable/installation/
 - Integrated the Weather API to fetch historical data for model training and real-time conditions for predicting reservations and collections.
 - Co-Developed unit and integration tests using pytest and FastAPI TestClient with Jed Leas.
 - Reviewed pull requests.
-- 
 
 <br>
 
