@@ -392,7 +392,7 @@ def generate_production_recommendations(vendor_id, db):
 
                         # If the string is not empty add connecting words
                         if top_products != "":
-                            top_products += ", "
+                            top_products += " and "
                             recommendation_text += " and "
 
                         top_products += name
