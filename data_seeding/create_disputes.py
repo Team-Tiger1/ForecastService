@@ -1,3 +1,4 @@
+from datetime import timedelta
 import random
 import uuid
 
@@ -37,30 +38,45 @@ def simulate_dispute(reservation_id):
 
     # Each different dispute scenario and a corresponding approval and deny response
     possible_disputes = {
-        "missing_items": {
-            "complaint": "I collected my bundle but there were missing items.",
+        "DAMAGED": {
+            "description": "Bundle was damaged.",
             "vendor_approve_response": "We apologise for this. This is not acceptable. We will refund you for this bundle.",
-            "vendor_deny_response": "Unfortunately, we will not be able to refund this bundle. We know that all items were placed inside this bundle.",
+            "vendor_deny_response": "Unfortunately, we will not be able to refund this bundle.",
         },
-        "spoiled_item": {
-            "complaint": "One of the items was already spoiled when I got home.",
-            "vendor_approve_response": "This is unacceptable. We are deeply sorry for this. We will refund you for this bundle.",
-            "vendor_deny_response": "Unfortunately, we will not be able to refund this bundle. All produce placed into this bundle was quality and date checked by a member of our team."
+        "MISSING_ITEMS": {
+            "description": "Bundle had missing items.",
+            "vendor_approve_response": "We apologise for this. This is not acceptable. We will refund you for this bundle.",
+            "vendor_deny_response": "Unfortunately, we will not be able to refund this bundle.",
         },
-        "vendor_closed_early": {
-            "complaint": "I arrived during the pickup window but the shop was already closed.",
-            "vendor_approve_response": "We apologise for this issue. We had to close early due to an issue. We will refund you for this bundle.",
-            "vendor_deny_response": "Unfortunately, we will not be able to refund this bundle. We did not close early on this date.",
+        "QUALITY_ISSUES": {
+            "description": "Bundle was poor quality.",
+            "vendor_approve_response": "We apologise for this. This is not acceptable. We will refund you for this bundle.",
+            "vendor_deny_response": "Unfortunately, we will not be able to refund this bundle.",
         },
-        "rude_staff_member": {
-            "complaint": "I was spoken to rudely by a member of staff when collecting the bundle.",
-            "vendor_approve_response": "We are incredibly sorry for your experience. This is not the standard we expect from our staff. We will refund you for this bundle.",
-            "vendor_deny_response": "Unfortunately, we will not be able to refund this bundle. We have spoken to the staff member you interacted with and they claim to not have been rude.",
+        "LOCATION_INACCESSIBLE": {
+            "description": "I could not find the store.",
+            "vendor_approve_response": "We apologise for this. This is not acceptable. We will refund you for this bundle.",
+            "vendor_deny_response": "Unfortunately, we will not be able to refund this bundle.",
         },
-        "bundle_doesnt_match_desc": {
-            "complaint": "The items in my bundle do not match the description.",
-            "vendor_approve_response": "We apologise for this issue. We incorrectly labelled this bundle. We will refund you for this bundle.",
-            "vendor_deny_response": "Unfortunately, we will not be able to refund this bundle. We are able to confirm that this bundle did match the description."
+        "VENDOR_NO_SHOW": {
+            "description": "You were not there for me to collect my bundle.",
+            "vendor_approve_response": "We apologise for this. This is not acceptable. We will refund you for this bundle.",
+            "vendor_deny_response": "Unfortunately, we will not be able to refund this bundle.",
+        },
+        "REFUSED_COLLECTION": {
+            "description": "You did not let me collect my bundle.",
+            "vendor_approve_response": "We apologise for this. This is not acceptable. We will refund you for this bundle.",
+            "vendor_deny_response": "Unfortunately, we will not be able to refund this bundle.",
+        },
+        "PAST_WINDOW": {
+            "description": "The collection window closed before I got there.",
+            "vendor_approve_response": "We apologise for this. This is not acceptable. We will refund you for this bundle.",
+            "vendor_deny_response": "Unfortunately, we will not be able to refund this bundle.",
+        },
+        "OTHER": {
+            "description": "I was not happy with the service I received.",
+            "vendor_approve_response": "We apologise for this. This is not acceptable. We will refund you for this bundle.",
+            "vendor_deny_response": "Unfortunately, we will not be able to refund this bundle.",
         }
     }
 
@@ -73,17 +89,21 @@ def simulate_dispute(reservation_id):
         status = "APPROVED"
         vendor_response = chosen_dispute['vendor_approve_response']
     else:
-        status = "DENIED"
+        status = "REJECTED"
         vendor_response = chosen_dispute['vendor_deny_response']
 
+    dispute_id = str(uuid.uuid4())
 
     dispute = {
-        'reservation_id': reservation_id,
+        'dispute_id': dispute_id,
+        'bundle_id': bundle_id,
         'user_id': user_id,
         'vendor_id': vendor_id,
-        'reason': chosen_dispute['complaint'],
+        'description': chosen_dispute['description'],
+        'reason': random_dispute_key,
         'vendor_response': vendor_response,
-        'status': status
+        'status': status,
+        'time_created': pd.to_datetime(bundle['collection_end']) + timedelta(hours=1)
     }
 
     return dispute
@@ -98,8 +118,8 @@ def generate_disputes():
 
     for row in RESERVATIONS.itertuples():
 
-        # 37.5% chance of the reservation being disputed
-        if random.random() < 0.375:
+        # 30% chance of the reservation being disputed
+        if random.random() < 0.3:
             dispute = simulate_dispute(row.reservation_id)
             disputes_list.append(dispute)
 
